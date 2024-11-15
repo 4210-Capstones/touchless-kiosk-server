@@ -1,0 +1,14 @@
+version: "3"
+services:
+  database:
+    user: "${UID}:${GID}"
+    image: postgres:latest
+    restart: always
+    environment:
+      POSTGRES_USER: admin
+      POSTGRES_PASSWORD: 1234
+      POSTGRES_DB: touchless-kiosk-db
+    volumes:
+      - ./data:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
