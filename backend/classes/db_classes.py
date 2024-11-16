@@ -1,7 +1,7 @@
 """
 All database classes will be declared here
 """
-from sqlalchemy import Column, Integer, String, ForeignKey
+from sqlalchemy import Column, Integer, String, ForeignKey, DateTime
 from sqlalchemy.orm import declared_attr
 
 from database.config_db import BASE
@@ -60,6 +60,21 @@ class UserRoles(DBParentClass):
 
     user_id = Column(Integer, ForeignKey(User.user_id), primary_key=True)
     role_id = Column(Integer, ForeignKey(Roles.role_id), primary_key=True)
+
+class Service(DBParentClass):
+    __abstract__ = False
+
+    S_RoomNumber = Column(Integer, primary_key=True, nullable=False, unique=False)
+    S_Name = Column(String(50), nullable=False)
+
+class Booking(DBParentClass):
+    __abstract__ = False
+
+    B_StartDate = Column(DateTime, primary_key=True, nullable=False, unique=False)
+    B_EndDate = Column(DateTime, nullable=False, unique=False)
+    B_UserID = Column(Integer, ForeignKey(User.user_id), primary_key=True, nullable=False, unique=True)
+    B_Name = Column(String(50), nullable=False)
+    B_RoomNumber = Column(Integer, ForeignKey(Service.S_RoomNumber), primary_key=True, unique=False)
 
 # # Inspect and list tables
 # def list_tables():
