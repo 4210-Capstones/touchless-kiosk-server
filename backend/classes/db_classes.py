@@ -7,7 +7,7 @@ from sqlalchemy.orm import declared_attr
 from database.config_db import BASE
 
 from sqlalchemy import create_engine, inspect
-from backend.database.config_db import ENGINE  # Import your database engine
+#from database.config_db import ENGINE  # Import your database engine
 
 
 class DBParentClass(BASE):
@@ -29,7 +29,7 @@ class DBParentClass(BASE):
     def __tablename__(self):
         return self.__name__.lower()
 
-    id = Column(Integer, primary_key=True, index=True)
+    # id = Column(Integer, primary_key=True, index=True)
 
     def to_dict(self):
         return dict((col, getattr(self, col)) for col in self.__table__.columns.keys())
@@ -44,14 +44,14 @@ class DBParentClass(BASE):
 class User(DBParentClass):
     __abstract__ = False
 
-    user_id = Column(Integer, primary_key=True, autoincrement=True, nullable=False)
+    user_id = Column(Integer, primary_key=True, autoincrement=True, nullable=False, unique=True)
     email = Column(String(100), unique=True, nullable=False)
     password = Column(String(255), nullable=False)   # store hashed, not plain
 
 class Roles(DBParentClass):
     __abstract__ = False
 
-    role_id = Column(Integer, primary_key=True, autoincrement=True, nullable=False)
+    role_id = Column(Integer, primary_key=True, autoincrement=True, nullable=False, unique=True)
     role_name = Column(String(50), nullable=False)
     description = Column(String(255), nullable=False)
 

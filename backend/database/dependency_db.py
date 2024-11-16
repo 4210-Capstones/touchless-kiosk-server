@@ -2,7 +2,7 @@ from contextlib import contextmanager
 
 from sqlalchemy.orm import sessionmaker
 
-from backend.database.config_db import engine
+from database.config_db import engine
 
 
 def get_db():
