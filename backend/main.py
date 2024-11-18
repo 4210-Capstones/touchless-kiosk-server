@@ -1,4 +1,4 @@
-from classes.db_classes import User, Roles, UserRoles
+from classes.db_classes import User, Booking, Service, Club, ClubRequest, Image, Role, UserRole
 from database.Service import UserService
 from database.config_db import create_db
 from database.dependency_db import get_db
@@ -9,8 +9,13 @@ if __name__ == '__main__':
 
     create_db()
 
-    # UserRoles.__table__.drop(engine)
-    # Roles.__table__.drop(engine)
+    # Image.__table__.drop(engine)
+    # ClubRequest.__table__.drop(engine)
+    # Club.__table__.drop(engine)
+    # Booking.__table__.drop(engine)
+    # Service.__table__.drop(engine)
+    # UserRole.__table__.drop(engine)
+    # Role.__table__.drop(engine)
     # User.__table__.drop(engine)
 
     user = User(email='<EMAIL>', password='<PASSWORD>')
