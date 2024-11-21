@@ -12,3 +12,16 @@ services:
       - ./data:/var/lib/postgresql/data
     ports:
       - "5432:5432"
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./backend:/container/backend
+      - ./.env:/container/.env
+    env_file:
+      - .env
+    depends_on:
+      - database

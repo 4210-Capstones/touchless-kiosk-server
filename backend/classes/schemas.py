@@ -1,3 +1,7 @@
+"""
+Schemas are used as input to the API
+"""
+
 from pydantic import EmailStr, Field
 from pydantic import BaseModel
 

@@ -17,18 +17,17 @@ BASE = declarative_base()   # all database classes will inherit from BASE
 
 
 def wait_for_database():
-    printed = 0
+    retry_count = 0
     while True:
         try:
             with engine.connect() as connection:
                 print(f"Connected to database: {database_url}.")
                 return  # Exit the loop once the connection is successful
         except OperationalError:
-            if printed % 15 == 0:
-                print(f"Waiting for database connection: {database_url}.")
-                printed += 1
+            retry_count += 1
+            if retry_count % 5 == 0:  # Print every 5 retries
+                print(f"Waiting for database connection: {database_url}. Retry {retry_count}.")
             time.sleep(1)
-
 
 def create_db():
     """
