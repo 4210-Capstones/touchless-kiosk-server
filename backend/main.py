@@ -1,3 +1,4 @@
+import os
 from contextlib import asynccontextmanager
 
 from fastapi import FastAPI
@@ -10,8 +11,9 @@ from database import config_db
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     # Execute before app start
-    config_db.wait_for_database()
-    config_db.create_db()
+    if os.getenv("RUNNING_TESTS") != "true":
+        config_db.wait_for_database()
+        config_db.create_db()
 
     yield
 
