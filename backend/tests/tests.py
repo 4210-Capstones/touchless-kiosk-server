@@ -1,6 +1,7 @@
 import os
 
 from tests.setup.objects import user_schema
+from tests.setup.test_db import get_test_db
 
 os.environ['RUNNING_TESTS'] = 'true'
 
@@ -25,22 +26,22 @@ def user_id(client):
 
     assert ret.status_code == 201
 
-    db = next(override_get_db())
-    user = UserService.get_by_mail(user_schema.email, db)
+    with get_test_db() as db:
+        user = UserService.get_by_mail(user_schema.email, db)
 
     assert user.email == user_schema.email
     assert user.password != user_schema.password
 
     yield user.user_id
 
-    db = next(override_get_db())
-    UserService.delete(user.user_id, db)
+    with get_test_db() as db:
+        UserService.delete(user.user_id, db)
 
 
 @pytest.fixture(scope="module")
 def user_access_header(user_id, client):
-    db = next(override_get_db())
-    form_data = {"username": UserService.get(user_id, db).email, "password": user_schema.password}
+    with get_test_db() as db:
+        form_data = {"username": UserService.get(user_id, db).email, "password": user_schema.password}
 
     response = client.post("/login", data=form_data)
 
