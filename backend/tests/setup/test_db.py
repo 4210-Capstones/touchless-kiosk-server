@@ -6,7 +6,7 @@ from sqlalchemy_utils import database_exists, create_database
 
 from database.config_db import BASE
 
-SQLALCHEMY_DATABASE_URL = "sqlite:///test/test.db"
+SQLALCHEMY_DATABASE_URL = "sqlite:///tests/test.db"
 
 test_engine = create_engine(
     SQLALCHEMY_DATABASE_URL,
@@ -17,7 +17,9 @@ test_engine = create_engine(
 if not database_exists(test_engine.url):
     create_database(test_engine.url)
 
-BASE.metadata.create_all(test_engine)
+# delete and create all tables
+BASE.metadata.drop_all(bind=test_engine)
+BASE.metadata.create_all(bind=test_engine)
 
 TestingSessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=test_engine)
 
