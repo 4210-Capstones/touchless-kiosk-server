@@ -1,9 +1,9 @@
 import inspect
-import os
+import time
 from functools import wraps
 
 from sqlalchemy import create_engine
-from sqlalchemy.exc import SQLAlchemyError
+from sqlalchemy.exc import SQLAlchemyError, OperationalError
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import Session
 from sqlalchemy_utils import database_exists, create_database
@@ -14,6 +14,20 @@ import configuration
 database_url = configuration.database_url
 engine = create_engine(database_url, echo=False)    # the database engine, essentially the central communication point
 BASE = declarative_base()   # all database classes will inherit from BASE
+
+
+def wait_for_database():
+    printed = 0
+    while True:
+        try:
+            with engine.connect() as connection:
+                print(f"Connected to database: {database_url}.")
+                return  # Exit the loop once the connection is successful
+        except OperationalError:
+            if printed % 15 == 0:
+                print(f"Waiting for database connection: {database_url}.")
+                printed += 1
+            time.sleep(1)
 
 
 def create_db():

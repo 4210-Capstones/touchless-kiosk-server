@@ -1,14 +1,14 @@
 """
 All database classes will be declared here
 """
-import datetime
+from datetime import datetime
+
 from sqlalchemy import Column, Integer, String, ForeignKey, DateTime
 from sqlalchemy.orm import declared_attr, relationship
 
 from database.config_db import BASE
 
-from sqlalchemy import create_engine, inspect
-from datetime import datetime
+
 #from database.config_db import ENGINE  # Import your database engine
 
 

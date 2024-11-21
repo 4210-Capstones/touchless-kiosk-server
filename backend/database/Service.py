@@ -75,6 +75,10 @@ class UserService(Service):
         result = db.query(cls.model_class).filter(cls.model_class.user_id == user_id).first()
 
         return result
+
+    @classmethod
+    def get_by_mail(cls, mail: str, db: Session):
+        return db.query(cls.model_class).filter(cls.model_class.email == mail).first()
     
     @classmethod
     @autocommit

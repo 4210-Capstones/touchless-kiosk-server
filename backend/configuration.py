@@ -8,3 +8,5 @@ if os.path.exists(dotenv_path):
     load_dotenv(dotenv_path)
 
 database_url = os.getenv("DATABASE_URL")
+
+jwt_key_path = os.getenv("JWT_KEY_PATH")
