@@ -1,14 +1,18 @@
 # touchless-kiosk-server
 
-## Running the Database in Docker and Code
-### Dependencies
-pip install python-dotenv
+## Run completely in Docker
 
-pip install sqlalchemy
+Run the command:
 
-pip install sqlalchemy-utils
-### Building and Running the Postgres Image/Container in Docker
-docker-compose -f docker-compose.dev.yml up
-### Running the Code to Test
-py backend/main.py (from root directory)
-or cd backend and then py main.py
+`docker-compose -f docker-compose.dev.yml up`
+
+## Run database in Docker and API locally:
+
+1. `docker-compose -f docker-compose.dev.yml up database`
+2. Create new python environment (f.e. with conda) with python 12.
+3. pip install "fastapi[standard]"
+4. pip install --upgrade -r /container/requirements.txt
+5. In .env, change "database" to "localhost" in DATABASE_URL.
+6. Launch App with working directory set to backend.    
+   In PyCharm, adjust it in run configuration and mark backend directory as source root.   
+   [TODO: Find way to do it on command line, normal command (wont work): `uvicorn backend.main:app --reload`]
