@@ -32,10 +32,10 @@ def user_id(client):
     assert user.user_email == user_schema.user_email
     assert user.user_password != user_schema.user_password
 
-    yield user.user_id
+    yield user.id
 
     with get_test_db() as db:
-        UserService.delete(user.user_id, db)
+        UserService.delete(user.id, db)
 
 
 @pytest.fixture(scope="module")

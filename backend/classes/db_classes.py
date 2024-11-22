@@ -125,7 +125,7 @@ class Booking(DBParentClass):
     booking_enddate = Column(DateTime, nullable=False, unique=False)
     booking_userid = Column(Integer, ForeignKey(User.id), nullable=False, unique=True)
 
-    rooms : Mapped[List["Room"]] = relationship(secondary="BookingRoom", back_populates="bookings")
+    rooms : Mapped[List["Room"]] = relationship(secondary="bookingroom", back_populates="bookings")
 
 class BookingRoom(DBParentClass):
     __abstract__ = False
