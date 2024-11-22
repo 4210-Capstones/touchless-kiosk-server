@@ -4,7 +4,7 @@ from functools import wraps
 
 from sqlalchemy import create_engine
 from sqlalchemy.exc import SQLAlchemyError, OperationalError
-from sqlalchemy.ext.declarative import declarative_base
+from sqlalchemy.orm import declarative_base
 from sqlalchemy.orm import Session
 from sqlalchemy_utils import database_exists, create_database
 
