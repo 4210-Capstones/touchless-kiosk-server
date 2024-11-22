@@ -62,7 +62,7 @@ app.include_router(login_router)
     #user = User(user_email='toothless@yahoo.com', user_first='Toothless', user_last='Dragon', user_password='hiccup')
 
     # db = next(get_db())
-    # user_id = UserService.create(user, db).user_id
+    # user_id = UserService.create(user, db).id
     # print(f"User created with id {user_id}")
 
     db = next(get_db())

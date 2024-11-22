@@ -29,15 +29,15 @@ class Service(ABC):
     """
     model_class: DBParentClass
 
-    # @classmethod
-    # def get(cls, id: int, db: Session):
-    #     result = db.query(cls.model_class).filter(cls.model_class.id == id).first()
+    @classmethod
+    def get(cls, id: int, db: Session):
+        result = db.query(cls.model_class).filter(cls.model_class.id == id).first()
 
-    #     return result
+        return result
 
-    # @classmethod
-    # def get_all(cls, db: Session, limit: int = 100):
-    #    return db.query(cls.model_class).order_by(cls.model_class.id.asc()).limit(limit).all()
+    @classmethod
+    def get_all(cls, db: Session, limit: int = 100):
+       return db.query(cls.model_class).order_by(cls.model_class.id.asc()).limit(limit).all()
 
     @classmethod
     @autocommit
@@ -51,38 +51,21 @@ class Service(ABC):
         for t in ts:
             db.add(t)
 
-    # @classmethod
-    # @autocommit
-    # def update(cls, id: int, t: DBParentClass, db: Session):
-    #     t.id = id
-    #     db.merge(t)
-    #     return t
+    @classmethod
+    @autocommit
+    def update(cls, id: int, t: DBParentClass, db: Session):
+        t.id = id
+        db.merge(t)
+        return t
 
-    # @classmethod
-    # @autocommit
-    # def delete(cls, id: int, db: Session):
-    #     obj = db.query(cls.model_class).filter(cls.model_class.id == id).one()
-    #     db.delete(obj)
-    #     return id
+    @classmethod
+    @autocommit
+    def delete(cls, id: int, db: Session):
+        obj = db.query(cls.model_class).filter(cls.model_class.id == id).one()
+        db.delete(obj)
+        return id
 
 
 class UserService(Service):
     model_class = User
-
-    @classmethod
-    @autocommit
-    def get(cls, user_id: int, db: Session):
-        result = db.query(cls.model_class).filter(cls.model_class.user_id == user_id).first()
-
-        return result
-
-    @classmethod
-    def get_by_mail(cls, mail: str, db: Session):
-        return db.query(cls.model_class).filter(cls.model_class.user_email == mail).first()
     
-    @classmethod
-    @autocommit
-    def delete(cls, user_id: int, db: Session):
-        obj = db.query(cls.model_class).filter(cls.model_class.user_id == user_id).one()
-        db.delete(obj)
-        return id
