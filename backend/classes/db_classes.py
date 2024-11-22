@@ -2,7 +2,7 @@
 All database classes will be declared here
 """
 from datetime import datetime
-from sqlalchemy import Column, Integer, String, ForeignKey, DateTime
+from sqlalchemy import Column, Integer, String, ForeignKey, DateTime, Boolean
 from sqlalchemy.orm import declared_attr, relationship
 
 from database.config_db import BASE
@@ -30,7 +30,7 @@ class DBParentClass(BASE):
     def __tablename__(self):
         return self.__name__.lower()
 
-    # id = Column(Integer, primary_key=True, index=True)
+    # id = Column(Integer, primary_key=True, index=True, autoincrement=True)
 
     def to_dict(self):
         return dict((col, getattr(self, col)) for col in self.__table__.columns.keys())
@@ -47,13 +47,13 @@ class User(DBParentClass):
 
     user_id = Column(Integer, primary_key=True, autoincrement=True, nullable=False, unique=True)
     user_email = Column(String(100), unique=True, nullable=False)
-    user_first = Column(String(100), nullable=False)
-    user_last = Column(String(100), nullable=False)
+    user_first = Column(String(100), nullable=True)
+    user_last = Column(String(100), nullable=True)
     user_password = Column(String(255), nullable=False)   # store hashed, not plain
 
-    user_roles = relationship("Role", secondary="userrole", back_populates="users")
+    # user_roles = relationship("Role", secondary="userrole", back_populates="users")
 
-class Role(DBParentClass):
+"""class Role(DBParentClass):
     __abstract__ = False
 
     role_id = Column(Integer, primary_key=True, autoincrement=True, nullable=False, unique=True)
@@ -158,7 +158,7 @@ class ClubRequest(DBParentClass):
     clubreq_date = Column(DateTime, default=datetime.utcnow())
     club_id = Column(Integer, ForeignKey(Club.club_id), nullable=False)
 
-    clubs = relationship("Club", back_populates="requests")
+    clubs = relationship("Club", back_populates="requests")"""
 
 # # Inspect and list tables
 # def list_tables():

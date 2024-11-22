@@ -1,9 +1,9 @@
-from classes.db_classes import User, Booking, BookingRoom, BookingType, Club, ClubRequest, Image, Role, UserRole, Tag, ImageTag, Room, ImageRequest
+"""from classes.db_classes import User, Booking, BookingRoom, BookingType, Club, ClubRequest, Image, Role, UserRole, Tag, ImageTag, Room, ImageRequest
 from database.Service import UserService
 from database.config_db import create_db
 from database.dependency_db import get_db
 from database.config_db import engine
-from sqlalchemy_data_model_visualizer import generate_data_model_diagram, add_web_font_and_interactivity
+from sqlalchemy_data_model_visualizer import generate_data_model_diagram, add_web_font_and_interactivity"""
 
 from contextlib import asynccontextmanager
 
@@ -28,9 +28,10 @@ async def lifespan(app: FastAPI):
 app = FastAPI(lifespan=lifespan)
 
 app.include_router(user_router)
+app.include_router(login_router)
 
 # just a test for db so far
-if __name__ == '__main__':
+"""if __name__ == '__main__':
 
     create_db()
 
@@ -79,4 +80,4 @@ if __name__ == '__main__':
     # if UserService.get(user_id, db) is None:
     #     print("Successfully deleted")
     # else:
-    #     print("Not successful")
+    #     print("Not successful")"""

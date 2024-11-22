@@ -31,7 +31,7 @@ def login_for_access_token(form_data: OAuth2PasswordRequestForm, db: Session) ->
     if user is None:
         raise HTTPException(401, "User not found")
 
-    verified = verify_password(form_data.password, user.password)
+    verified = verify_password(form_data.password, user.user_password)
 
     if not verified:
         raise HTTPException(
@@ -41,7 +41,7 @@ def login_for_access_token(form_data: OAuth2PasswordRequestForm, db: Session) ->
         )
 
     access_token = create_access_token(
-        {"sub": user.email},
+        {"sub": user.user_email},
         expires_delta= datetime.timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES),
     )
 

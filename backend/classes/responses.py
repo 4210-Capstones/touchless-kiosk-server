@@ -6,4 +6,4 @@ from pydantic import BaseModel, EmailStr
 
 
 class UserResponse(BaseModel):
-    email: EmailStr
+    user_email: EmailStr
