@@ -5,7 +5,7 @@ from datetime import datetime
 from sqlalchemy import Column, Integer, String, ForeignKey, DateTime, Boolean
 from sqlalchemy.orm import declared_attr, relationship
 
-from database.config_db import BASE
+from backend.database.config_db import BASE
 
 
 #from database.config_db import ENGINE  # Import your database engine

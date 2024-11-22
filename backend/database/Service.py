@@ -7,8 +7,8 @@ from typing import Iterable
 
 from sqlalchemy.orm import Session
 
-from classes.db_classes import DBParentClass, User
-from database.config_db import autocommit
+from backend.classes.db_classes import DBParentClass, User
+from backend.database.config_db import autocommit
 
 
 class Service(ABC):

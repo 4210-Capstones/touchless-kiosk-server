@@ -6,10 +6,10 @@ from jose import jwt, ExpiredSignatureError, JWTError
 from passlib.context import CryptContext
 from requests import Session
 
-from classes.db_classes import User
-from database.Service import UserService
-from database.dependency_db import get_db
-from other import helper
+from backend.classes.db_classes import User
+from backend.database.Service import UserService
+from backend.database.dependency_db import get_db
+from backend.other import helper
 
 ACCESS_TOKEN_EXPIRE_MINUTES = 30
 JWT_KEY = helper.generate_jwt_key_file_if_not_exist()

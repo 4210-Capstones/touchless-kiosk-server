@@ -9,9 +9,9 @@ from contextlib import asynccontextmanager
 
 from fastapi import FastAPI
 
-from api.LoginAPI import login_router
-from api.UserAPI import user_router
-from database import config_db
+from backend.api.LoginAPI import login_router
+from backend.api.UserAPI import user_router
+from backend.database import config_db
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):

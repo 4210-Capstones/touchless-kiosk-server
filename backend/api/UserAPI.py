@@ -6,12 +6,12 @@ All endpoints which are wrapped with this router will start with "/users".
 from fastapi import APIRouter, Depends
 from sqlalchemy.orm import Session
 
-from classes.db_classes import User
-from classes.responses import UserResponse
-from classes.schemas import UserSchema
-from database.dependency_db import get_db
-from handler import UserHandler
-from handler.LoginHandler import get_current_user
+from backend.classes.db_classes import User
+from backend.classes.responses import UserResponse
+from backend.classes.schemas import UserSchema
+from backend.database.dependency_db import get_db
+from backend.handler import UserHandler
+from backend.handler.LoginHandler import get_current_user
 
 user_router = APIRouter(prefix="/users", tags=["Users"])    # tags define metadata for documentation purposes
 

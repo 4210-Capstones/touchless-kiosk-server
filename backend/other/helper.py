@@ -1,7 +1,7 @@
 import os
 import secrets
 
-import configuration
+from backend import configuration
 
 
 def generate_jwt_key_file_if_not_exist() -> str:

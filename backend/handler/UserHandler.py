@@ -5,10 +5,10 @@ from fastapi import HTTPException
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import Session
 
-from classes.db_classes import User
-from classes.schemas import UserSchema
-from database.Service import UserService
-from handler import LoginHandler
+from backend.classes.db_classes import User
+from backend.classes.schemas import UserSchema
+from backend.database.Service import UserService
+from backend.handler import LoginHandler
 
 
 def create_user(user: UserSchema, db: Session) -> None:
