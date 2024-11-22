@@ -1,0 +1,34 @@
+name: Docker Image CI
+
+on:
+  push:
+    branches:
+      - '*'
+  pull_request:
+    branches:
+      - '*'
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Build Docker Images
+      run: |
+        docker-compose -f docker-compose.dev.yml build
+
+    - name: Run Services
+      run: |
+        docker-compose -f docker-compose.dev.yml up -d
+
+    - name: Run Tests
+      run: |
+        docker-compose -f docker-compose.dev.yml exec app pytest
+
+    - name: Tear Down Services
+      if: always()
+      run: |
+        docker-compose -f docker-compose.dev.yml down
+
