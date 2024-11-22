@@ -33,3 +33,17 @@ Send token in header
 `curl -X GET -H "Authorization: Bearer [your_token]" http://localhost:8000/users/profil
 e`    
 You should receive: `{"email":"user@example.com"}`
+
+## Running tests
+
+Run locally:   
+`pytest`
+
+Run in docker:
+- Open internal docker console of "app" service and do as above or
+- Run one of the command on an external console:   
+  `docker-compose -f docker-compose.dev.yml exec app pytest`
+
+To disable warnings add `--disable-warnings` flag
+
+
