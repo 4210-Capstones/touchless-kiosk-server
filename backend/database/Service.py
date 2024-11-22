@@ -35,9 +35,9 @@ class Service(ABC):
 
     #     return result
 
-    @classmethod
-    def get_all(cls, db: Session, limit: int = 100):
-        return db.query(cls.model_class).order_by(cls.model_class.id.asc()).limit(limit).all()
+    # @classmethod
+    # def get_all(cls, db: Session, limit: int = 100):
+    #    return db.query(cls.model_class).order_by(cls.model_class.id.asc()).limit(limit).all()
 
     @classmethod
     @autocommit
