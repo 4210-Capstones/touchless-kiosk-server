@@ -8,7 +8,7 @@ from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import Session
 from sqlalchemy_utils import database_exists, create_database
 
-import configuration
+from backend import configuration
 
 # some necessary configuration
 database_url = configuration.database_url

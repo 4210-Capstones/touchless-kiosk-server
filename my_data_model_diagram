@@ -1,0 +1,173 @@
+// Interactive Data Models
+digraph {
+	graph [bgcolor="#EEEEEE" rankdir=TB splines=spline]
+	node [fontname=Roboto fontsize=12 shape=none]
+	edge [fontname=Roboto fontsize=10]
+	User [label=<
+        <TABLE BORDER="0" CELLBORDER="1" CELLSPACING="0">
+        <TR><TD COLSPAN="2" BGCOLOR="#3F51B5"><FONT COLOR="white">User</FONT></TD></TR>
+        <TR>
+                         <TD BGCOLOR="#BBDEFB">user_id</TD>
+                         <TD BGCOLOR="#BBDEFB">INTEGER (PK,Unique)</TD>
+                         </TR><TR>
+                         <TD BGCOLOR="#BBDEFB">user_email</TD>
+                         <TD BGCOLOR="#BBDEFB">VARCHAR(100) (Unique)</TD>
+                         </TR><TR>
+                         <TD BGCOLOR="#BBDEFB">user_first</TD>
+                         <TD BGCOLOR="#BBDEFB">VARCHAR(100) ()</TD>
+                         </TR><TR>
+                         <TD BGCOLOR="#BBDEFB">user_last</TD>
+                         <TD BGCOLOR="#BBDEFB">VARCHAR(100) ()</TD>
+                         </TR><TR>
+                         <TD BGCOLOR="#BBDEFB">user_password</TD>
+                         <TD BGCOLOR="#BBDEFB">VARCHAR(255) ()</TD>
+                         </TR></TABLE>> URL="http://User_details.html"]
+	User -> Role [label=user_roles color="#1E88E5" style=dashed tooltip="Relation between User and Role"]
+	Role [label=<
+        <TABLE BORDER="0" CELLBORDER="1" CELLSPACING="0">
+        <TR><TD COLSPAN="2" BGCOLOR="#3F51B5"><FONT COLOR="white">Role</FONT></TD></TR>
+        <TR>
+                         <TD BGCOLOR="#BBDEFB">role_id</TD>
+                         <TD BGCOLOR="#BBDEFB">INTEGER (PK,Unique)</TD>
+                         </TR><TR>
+                         <TD BGCOLOR="#BBDEFB">role_name</TD>
+                         <TD BGCOLOR="#BBDEFB">VARCHAR(50) ()</TD>
+                         </TR><TR>
+                         <TD BGCOLOR="#BBDEFB">description</TD>
+                         <TD BGCOLOR="#BBDEFB">VARCHAR(255) ()</TD>
+                         </TR></TABLE>> URL="http://Role_details.html"]
+	Role -> User [label=users color="#1E88E5" style=dashed tooltip="Relation between Role and User"]
+	UserRole [label=<
+        <TABLE BORDER="0" CELLBORDER="1" CELLSPACING="0">
+        <TR><TD COLSPAN="2" BGCOLOR="#3F51B5"><FONT COLOR="white">UserRole</FONT></TD></TR>
+        <TR>
+                         <TD BGCOLOR="#BBDEFB">user_id</TD>
+                         <TD BGCOLOR="#BBDEFB">INTEGER (PK)</TD>
+                         </TR><TR>
+                         <TD BGCOLOR="#BBDEFB">role_id</TD>
+                         <TD BGCOLOR="#BBDEFB">INTEGER (PK)</TD>
+                         </TR></TABLE>> URL="http://UserRole_details.html"]
+	Tag [label=<
+        <TABLE BORDER="0" CELLBORDER="1" CELLSPACING="0">
+        <TR><TD COLSPAN="2" BGCOLOR="#3F51B5"><FONT COLOR="white">Tag</FONT></TD></TR>
+        <TR>
+                         <TD BGCOLOR="#BBDEFB">tag_id</TD>
+                         <TD BGCOLOR="#BBDEFB">INTEGER (PK)</TD>
+                         </TR><TR>
+                         <TD BGCOLOR="#BBDEFB">tag_name</TD>
+                         <TD BGCOLOR="#BBDEFB">VARCHAR(50) ()</TD>
+                         </TR><TR>
+                         <TD BGCOLOR="#BBDEFB">tag_description</TD>
+                         <TD BGCOLOR="#BBDEFB">VARCHAR ()</TD>
+                         </TR></TABLE>> URL="http://Tag_details.html"]
+	Image [label=<
+        <TABLE BORDER="0" CELLBORDER="1" CELLSPACING="0">
+        <TR><TD COLSPAN="2" BGCOLOR="#3F51B5"><FONT COLOR="white">Image</FONT></TD></TR>
+        <TR>
+                         <TD BGCOLOR="#BBDEFB">image_link</TD>
+                         <TD BGCOLOR="#BBDEFB">VARCHAR (PK,Unique)</TD>
+                         </TR></TABLE>> URL="http://Image_details.html"]
+	Image -> ImageRequest [label=image_requests color="#1E88E5" style=dashed tooltip="Relation between Image and ImageRequest"]
+	ImageTag [label=<
+        <TABLE BORDER="0" CELLBORDER="1" CELLSPACING="0">
+        <TR><TD COLSPAN="2" BGCOLOR="#3F51B5"><FONT COLOR="white">ImageTag</FONT></TD></TR>
+        <TR>
+                         <TD BGCOLOR="#BBDEFB">image_link</TD>
+                         <TD BGCOLOR="#BBDEFB">VARCHAR (PK)</TD>
+                         </TR><TR>
+                         <TD BGCOLOR="#BBDEFB">tag_id</TD>
+                         <TD BGCOLOR="#BBDEFB">INTEGER (PK)</TD>
+                         </TR></TABLE>> URL="http://ImageTag_details.html"]
+	Room [label=<
+        <TABLE BORDER="0" CELLBORDER="1" CELLSPACING="0">
+        <TR><TD COLSPAN="2" BGCOLOR="#3F51B5"><FONT COLOR="white">Room</FONT></TD></TR>
+        <TR>
+                         <TD BGCOLOR="#BBDEFB">room_number</TD>
+                         <TD BGCOLOR="#BBDEFB">INTEGER (PK,Unique)</TD>
+                         </TR><TR>
+                         <TD BGCOLOR="#BBDEFB">room_available</TD>
+                         <TD BGCOLOR="#BBDEFB">BOOLEAN ()</TD>
+                         </TR></TABLE>> URL="http://Room_details.html"]
+	Booking [label=<
+        <TABLE BORDER="0" CELLBORDER="1" CELLSPACING="0">
+        <TR><TD COLSPAN="2" BGCOLOR="#3F51B5"><FONT COLOR="white">Booking</FONT></TD></TR>
+        <TR>
+                         <TD BGCOLOR="#BBDEFB">booking_id</TD>
+                         <TD BGCOLOR="#BBDEFB">INTEGER (PK,Unique)</TD>
+                         </TR><TR>
+                         <TD BGCOLOR="#BBDEFB">bookingtype_id</TD>
+                         <TD BGCOLOR="#BBDEFB">INTEGER ()</TD>
+                         </TR><TR>
+                         <TD BGCOLOR="#BBDEFB">booking_startdate</TD>
+                         <TD BGCOLOR="#BBDEFB">DATETIME ()</TD>
+                         </TR><TR>
+                         <TD BGCOLOR="#BBDEFB">booking_enddate</TD>
+                         <TD BGCOLOR="#BBDEFB">DATETIME ()</TD>
+                         </TR><TR>
+                         <TD BGCOLOR="#BBDEFB">booking_userid</TD>
+                         <TD BGCOLOR="#BBDEFB">INTEGER (Unique)</TD>
+                         </TR></TABLE>> URL="http://Booking_details.html"]
+	ImageRequest [label=<
+        <TABLE BORDER="0" CELLBORDER="1" CELLSPACING="0">
+        <TR><TD COLSPAN="2" BGCOLOR="#3F51B5"><FONT COLOR="white">ImageRequest</FONT></TD></TR>
+        <TR>
+                         <TD BGCOLOR="#BBDEFB">imgreq_id</TD>
+                         <TD BGCOLOR="#BBDEFB">INTEGER (PK)</TD>
+                         </TR><TR>
+                         <TD BGCOLOR="#BBDEFB">imgreq_name</TD>
+                         <TD BGCOLOR="#BBDEFB">VARCHAR(50) ()</TD>
+                         </TR><TR>
+                         <TD BGCOLOR="#BBDEFB">imgreq_email</TD>
+                         <TD BGCOLOR="#BBDEFB">VARCHAR(100) (Unique)</TD>
+                         </TR><TR>
+                         <TD BGCOLOR="#BBDEFB">imgreq_message</TD>
+                         <TD BGCOLOR="#BBDEFB">VARCHAR ()</TD>
+                         </TR><TR>
+                         <TD BGCOLOR="#BBDEFB">imgreq_link</TD>
+                         <TD BGCOLOR="#BBDEFB">VARCHAR ()</TD>
+                         </TR><TR>
+                         <TD BGCOLOR="#BBDEFB">imgreq_startdate</TD>
+                         <TD BGCOLOR="#BBDEFB">DATETIME ()</TD>
+                         </TR><TR>
+                         <TD BGCOLOR="#BBDEFB">imgreq_enddate</TD>
+                         <TD BGCOLOR="#BBDEFB">DATETIME ()</TD>
+                         </TR></TABLE>> URL="http://ImageRequest_details.html"]
+	ImageRequest -> Image [label=images color="#1E88E5" style=dashed tooltip="Relation between ImageRequest and Image"]
+	Club [label=<
+        <TABLE BORDER="0" CELLBORDER="1" CELLSPACING="0">
+        <TR><TD COLSPAN="2" BGCOLOR="#3F51B5"><FONT COLOR="white">Club</FONT></TD></TR>
+        <TR>
+                         <TD BGCOLOR="#BBDEFB">club_id</TD>
+                         <TD BGCOLOR="#BBDEFB">INTEGER (PK)</TD>
+                         </TR><TR>
+                         <TD BGCOLOR="#BBDEFB">club_name</TD>
+                         <TD BGCOLOR="#BBDEFB">VARCHAR(50) (Unique)</TD>
+                         </TR><TR>
+                         <TD BGCOLOR="#BBDEFB">club_description</TD>
+                         <TD BGCOLOR="#BBDEFB">VARCHAR ()</TD>
+                         </TR><TR>
+                         <TD BGCOLOR="#BBDEFB">club_upcoming_activities</TD>
+                         <TD BGCOLOR="#BBDEFB">VARCHAR ()</TD>
+                         </TR></TABLE>> URL="http://Club_details.html"]
+	Club -> ClubRequest [label=requests color="#1E88E5" style=dashed tooltip="Relation between Club and ClubRequest"]
+	ClubRequest [label=<
+        <TABLE BORDER="0" CELLBORDER="1" CELLSPACING="0">
+        <TR><TD COLSPAN="2" BGCOLOR="#3F51B5"><FONT COLOR="white">ClubRequest</FONT></TD></TR>
+        <TR>
+                         <TD BGCOLOR="#BBDEFB">clubreq_id</TD>
+                         <TD BGCOLOR="#BBDEFB">INTEGER (PK)</TD>
+                         </TR><TR>
+                         <TD BGCOLOR="#BBDEFB">clubreq_name</TD>
+                         <TD BGCOLOR="#BBDEFB">VARCHAR(50) ()</TD>
+                         </TR><TR>
+                         <TD BGCOLOR="#BBDEFB">clubreq_email</TD>
+                         <TD BGCOLOR="#BBDEFB">VARCHAR(100) ()</TD>
+                         </TR><TR>
+                         <TD BGCOLOR="#BBDEFB">clubreq_date</TD>
+                         <TD BGCOLOR="#BBDEFB">DATETIME ()</TD>
+                         </TR><TR>
+                         <TD BGCOLOR="#BBDEFB">club_id</TD>
+                         <TD BGCOLOR="#BBDEFB">INTEGER ()</TD>
+                         </TR></TABLE>> URL="http://ClubRequest_details.html"]
+	ClubRequest -> Club [label=clubs color="#1E88E5" style=dashed tooltip="Relation between ClubRequest and Club"]
+}

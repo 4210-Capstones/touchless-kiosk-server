@@ -7,8 +7,8 @@ from typing import Iterable
 
 from sqlalchemy.orm import Session
 
-from classes.db_classes import DBParentClass, User
-from database.config_db import autocommit
+from backend.classes.db_classes import DBParentClass, User
+from backend.database.config_db import autocommit
 
 
 class Service(ABC):
@@ -78,7 +78,7 @@ class UserService(Service):
 
     @classmethod
     def get_by_mail(cls, mail: str, db: Session):
-        return db.query(cls.model_class).filter(cls.model_class.email == mail).first()
+        return db.query(cls.model_class).filter(cls.model_class.user_email == mail).first()
     
     @classmethod
     @autocommit

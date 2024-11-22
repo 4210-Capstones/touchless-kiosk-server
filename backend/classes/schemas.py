@@ -7,5 +7,5 @@ from pydantic import BaseModel
 
 
 class UserSchema(BaseModel):
-    email: EmailStr
-    password: str =  Field(min_length=8, description="Password must be at least 8 characters long")
+    user_email: EmailStr
+    user_password: str =  Field(min_length=8, description="Password must be at least 8 characters long")
