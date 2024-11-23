@@ -4,7 +4,9 @@
 
 Run the command:
 
-`docker-compose -f docker-compose.dev.yml up`
+`docker-compose -f docker-compose.dev.yml up`   
+
+Use flag `-d` to detach
 
 ## Run database in Docker and API locally:
 
@@ -12,10 +14,9 @@ Run the command:
 2. Create new python environment (f.e. with conda) with python 12.
 3. pip install "fastapi[standard]"
 4. pip install --upgrade -r requirements.txt
-5. In .env, change "database" to "localhost" in DATABASE_URL.
-6. Launch App with working directory set to backend.    
-   In PyCharm, adjust it in run configuration and mark backend directory as source root.   
-   [TODO: Find way to do it on command line, normal command (wont work): `uvicorn backend.main:app --reload`]
+5. In .env, change "database" to "localhost" in DATABASE_URL (do **not** commit this change!!!).
+6. Launch App from project root.   
+   `uvicorn backend.main:app --reload`
 
 ## Example usage with curl:
 
@@ -45,5 +46,49 @@ Run in docker:
   `docker-compose -f docker-compose.dev.yml exec app pytest`
 
 To disable warnings add `--disable-warnings` flag
+
+## Development
+
+For most purposes the following will be sufficient:
+
+1. The API part only handles API related logic.
+   - [If necessary: Create a new `xyzAPI.py` file in backend/api. Introduce a new router, include it to app in `main.py`]
+   - Create a new endpoint in `xyzAPI.py` file. Keep the following in mind:
+     - If your endpoint needs a body, e.g. more complicated data like a class, create a schema in `classes/schemas.py` and use it as input to the endpoint
+     - If your endpoint needs access to the database, include it with `db: Session = Depends(get_db)` as parameter and pass it down.
+     - If your endpoint needs to be restricted, e.g. only available to logged in users, include `user: User = Depends(get_current_user)` as parameter (or `get_current_admin` etc, if it is already implemented)
+     - If your endpoint needs to return more complicated data like a class, create a response in `classes/responses.py` and use that
+   - For the rest, call a function in the handler
+2. The handler deals with high end-logic (doesn't deal with database directly)
+   - [If necessary: Create a new `xyzHandler.py` file in `backend/handler`.]
+   - Create a function which the endpoint will call
+   - Deal with high end-logic (f.e. hash a password)
+   - To interact with the database call a Service function (located in `database/Service`)
+3. To interact with the database, create a new Service class
+   - Each table in the database has to have its own Service class to enable interaction
+   - Make it inherit from the parent Service class. It will add basic functionality, like create, get, update, delete.
+   - Specify the used table with `model_class = ...`
+   - [If necessary, you can overwrite those for your service class, but this should rarely be the case]
+   - Extend your Service class with more functionality (f.e. for user: `get_by_mail`)
+4. Create your own database classes in `classes/db_classes`. Those will mirror database entries as python objects.
+   - Make your class inherit from the database parent class. It introduces an `id` parameter and generates a table name from the class name
+   - Add `__abstract__ = False` to your class
+   - Follow the introduced structure
+   - To get help with relationships between classes, reach out to POD4
+   - **DO NOT** change existing class attributes
+   - The database is automatically created on startup
+   - It might happen, that your local database won't be compatible with new changes to the database. In this case, delete all tables or delete the entire database docker image (it will delete all data)
+5. Add tests to your endpoint. Things to keep in mind:
+   - The testing session creates a new local database separate from the rest
+   - Tests should not depend on each other, use pytest fixtures to input necessary data
+   - Fixtures in `conftest.py` are available to all tests. Look at the fixtures already defined
+   - To have access to the client, or any other fixture, include it as parameter
+   - To use the database do: `with get_test_db() as db:`
+   - To create a new testfile:
+     - Name it `test_xyz.py`, otherwise it will not be auto-detected
+     - Include as the very first two lines:   
+       `import os`    
+       `os.environ['RUNNING_TESTS'] = 'true'`
+
 
 
