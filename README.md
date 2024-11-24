@@ -8,15 +8,19 @@ Run the command:
 
 Use flag `-d` to detach
 
-## Run database in Docker and API locally:
+## Run database ~~in Docker~~ and API locally:
 
-1. `docker-compose -f docker-compose.dev.yml up database`
+1. ~~`docker-compose -f docker-compose.dev.yml up database`~~
 2. Create new python environment (f.e. with conda) with python 12.
 3. pip install "fastapi[standard]"
 4. pip install --upgrade -r requirements.txt
-5. In .env, change "database" to "localhost" in DATABASE_URL (do **not** commit this change!!!).
+5. ~~In .env, change "database" to "localhost" in DATABASE_URL (do **not** commit this change!!!).~~
 6. Launch App from project root.   
    `uvicorn backend.main:app --reload`
+
+## Docs
+
+Go to http://localhost:8000/docs to see the docs (both local and docker)
 
 ## Example usage with curl:
 
@@ -49,6 +53,13 @@ To disable warnings add `--disable-warnings` flag
 
 ## Development
 
+### !!!
+**DO NOT** work on the main branch, create your own, or even better: create one per issue.   
+When you finish development, run the tests, and fix stuff until all of them run successfully.   
+Then, merge the updated main branch into your branch, and run the tests again. If changes to main occurred in the meantime, redo the process.
+Only then, merge your updated branch back into main, push it.
+### !!!
+
 For most purposes the following will be sufficient:
 
 1. The API part only handles API related logic.
@@ -68,7 +79,7 @@ For most purposes the following will be sufficient:
    - Each table in the database has to have its own Service class to enable interaction
    - Make it inherit from the parent Service class. It will add basic functionality, like create, get, update, delete.
    - Specify the used table with `model_class = ...`
-   - [If necessary, you can overwrite those for your service class, but this should rarely be the case]
+   - [If necessary, you can overwrite create, get, etc. for your service class, but this should rarely be the case]
    - Extend your Service class with more functionality (f.e. for user: `get_by_mail`)
 4. Create your own database classes in `classes/db_classes`. Those will mirror database entries as python objects.
    - Make your class inherit from the database parent class. It introduces an `id` parameter and generates a table name from the class name
@@ -77,7 +88,7 @@ For most purposes the following will be sufficient:
    - To get help with relationships between classes, reach out to POD4
    - **DO NOT** change existing class attributes
    - The database is automatically created on startup
-   - It might happen, that your local database won't be compatible with new changes to the database. In this case, delete all tables or delete the entire database docker image (it will delete all data)
+   - It might happen, that your local database won't be compatible with new changes to the database. In this case, delete all tables or delete the entire database ~~docker image~~ in `res/development.db` (it will delete all data)
 5. Add tests to your endpoint. Things to keep in mind:
    - The testing session creates a new local database separate from the rest
    - Tests should not depend on each other, use pytest fixtures to input necessary data

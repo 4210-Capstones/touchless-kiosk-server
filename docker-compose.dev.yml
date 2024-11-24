@@ -1,16 +1,16 @@
 services:
-  database:
-    user: "${UID}:${GID}"
-    image: postgres:latest
-    restart: always
-    environment:
-      POSTGRES_USER: admin
-      POSTGRES_PASSWORD: 1234
-      POSTGRES_DB: touchless-kiosk-db
-    volumes:
-      - ./data:/var/lib/postgresql/data
-    ports:
-      - "5432:5432"
+  #database:
+  #  user: "${UID}:${GID}"
+  #  image: postgres:latest
+  #  restart: always
+  #  environment:
+  #    POSTGRES_USER: admin
+  #    POSTGRES_PASSWORD: 1234
+  #    POSTGRES_DB: touchless-kiosk-db
+  #  volumes:
+  #    - ./data:/var/lib/postgresql/data
+  #  ports:
+  #    - "5432:5432"
   app:
     build:
       context: .
@@ -22,5 +22,5 @@ services:
       - ./.env:/container/.env
     env_file:
       - .env
-    depends_on:
-      - database
+    #depends_on:
+    #  - database
