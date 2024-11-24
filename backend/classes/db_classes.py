@@ -123,9 +123,9 @@ class Booking(DBParentClass):
     bookingtype_id = Column(Integer, ForeignKey(BookingType.id), unique=False)
     booking_startdate = Column(DateTime, nullable=False, unique=False)
     booking_enddate = Column(DateTime, nullable=False, unique=False)
-    booking_userid = Column(Integer, ForeignKey(User.id), nullable=False, unique=True)
+    booking_userid = Column(Integer, ForeignKey(User.id), nullable=False)
 
-    rooms : Mapped[List["Room"]] = relationship(secondary="bookingroom", back_populates="bookings")
+    rooms : Mapped["Room"] = relationship(secondary="bookingroom", back_populates="bookings")
 
 class BookingRoom(DBParentClass):
     __abstract__ = False
@@ -165,10 +165,10 @@ class ClubRequest(DBParentClass):
     # clubreq_id = Column(Integer, primary_key=True, autoincrement=True, nullable=False)
     clubreq_name = Column(String(50), nullable=False)
     clubreq_email = Column(String(100), nullable=False)
-    clubreq_date = Column(DateTime, default=datetime.utcnow())
+    clubreq_date = Column(DateTime, default=datetime.utcnow)
     club_id = Column(Integer, ForeignKey(Club.id), nullable=False)
 
-    clubs : Mapped[List["Club"]] = relationship(back_populates="requests")
+    clubs : Mapped["Club"] = relationship(back_populates="requests")
 
 # # Inspect and list tables
 # def list_tables():
