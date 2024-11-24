@@ -16,7 +16,7 @@ from backend.database import config_db
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-    # Execute before app start
+    os.makedirs(os.path.dirname("res/"), exist_ok=True)
     if os.getenv("RUNNING_TESTS") != "true":
         config_db.wait_for_database()
         config_db.create_db()
