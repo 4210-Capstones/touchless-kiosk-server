@@ -23,11 +23,11 @@ Use flag `-d` to detach
 Go to http://localhost:8000/docs to see the docs (both local and docker)
 
 ## Example usage with curl:
-
+[Attention: Those commands reflect the API on Nov 26th. URLs and schemas might have changed, if it doesn't work.]
 **Create user**:   
 Send content as json   
-`curl -X POST -H "Content-Type: application/json" -d "{\"email\": \"user@example.com\", \"password\": \"12345678\"}" http://localhost:8000/users/`
-
+`curl -X POST -H "Content-Type: application/json" -d "{\"user_email\": \"user@example.com\", \"user_passwo
+rd\": \"12345678\"}" http://localhost:8000/users/`
 **Log in**:   
 Send request form as form data    
 `curl -X POST -d "username=user@example.com&password=12345678" http://localhost:8000/login/`   
@@ -35,8 +35,7 @@ You receive: `{"access_token":"[your_token]","token_type":"bearer"}`
 
 **Get user** (restricted endpoint):    
 Send token in header   
-`curl -X GET -H "Authorization: Bearer [your_token]" http://localhost:8000/users/profil
-e`    
+`curl -X GET -H "Authorization: Bearer [your_token]" http://localhost:8000/users/profile`    
 You should receive: `{"email":"user@example.com"}`
 
 ## Running tests
