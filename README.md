@@ -27,7 +27,7 @@ Go to http://localhost:8000/docs to see the docs (both local and docker)
 **Create user**:   
 Send content as json   
 `curl -X POST -H "Content-Type: application/json" -d "{\"user_email\": \"user@example.com\", \"user_passwo
-rd\": \"12345678\"}" http://localhost:8000/users/`
+rd\": \"12345678\"}" http://localhost:8000/users/`   
 **Log in**:   
 Send request form as form data    
 `curl -X POST -d "username=user@example.com&password=12345678" http://localhost:8000/login/`   
