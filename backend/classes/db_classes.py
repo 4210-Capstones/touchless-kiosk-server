@@ -142,7 +142,7 @@ class ImageRequest(DBParentClass):
     imgreq_name = Column(String(50), nullable=False)
     imgreq_email = Column(String(100), unique=True, nullable=False)
     imgreq_message = Column(String, nullable=False)
-    imgreq_link = Column(String, ForeignKey(Image.image_link), nullable=False)
+    imgreq_link = Column(String, ForeignKey(Image.image_link), nullable=True) # e.g. user can submit request to extend length of existing image without submitting new image
     imgreq_startdate = Column(DateTime, nullable=False, unique=False)
     imgreq_enddate = Column(DateTime, nullable=False, unique=False)
 

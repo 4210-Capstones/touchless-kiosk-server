@@ -7,17 +7,22 @@ from sqlalchemy_data_model_visualizer import generate_data_model_diagram, add_we
 
 import os
 from contextlib import asynccontextmanager
+from pathlib import Path
 
 from fastapi import FastAPI
 
+
+from backend.api.RequestFormAPI import requestform_router
 from backend.api.LoginAPI import login_router
 from backend.api.UserAPI import user_router
 from backend.database import config_db
 from backend.database import generate_mockdata
+from fastapi.staticfiles import StaticFiles
+from fastapi.middleware.cors import CORSMiddleware
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-    os.makedirs(os.path.dirname("res/"), exist_ok=True)
+    os.makedirs("uploads/img_requests", exist_ok=True)
     if os.getenv("RUNNING_TESTS") != "true":
         config_db.wait_for_database()
         config_db.create_db()
@@ -29,10 +34,22 @@ async def lifespan(app: FastAPI):
     pass
 
 
+
 app = FastAPI(lifespan=lifespan)
 
 app.include_router(user_router)
 app.include_router(login_router)
+app.include_router(requestform_router)
+app.mount("/uploads", StaticFiles(directory="uploads"), name="uploads")
+
+# Add CORS middleware to your FastAPI app
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],  # Replace "*" with specific origins for production
+    allow_credentials=True,
+    allow_methods=["*"],  # Allow all HTTP methods (e.g., GET, POST)
+    allow_headers=["*"],  # Allow all headers (e.g., Content-Type)
+)
 
 # just a test for db so far
 """if __name__ == '__main__':
