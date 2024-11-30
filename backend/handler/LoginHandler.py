@@ -1,10 +1,12 @@
 import datetime
 
-from fastapi import HTTPException, Depends
+from fastapi import HTTPException, Depends, FastAPI
 from fastapi.security import OAuth2PasswordRequestForm, OAuth2PasswordBearer
 from jose import jwt, ExpiredSignatureError, JWTError
 from passlib.context import CryptContext
 from requests import Session
+
+from fastapi.middleware.cors import CORSMiddleware #to run local
 
 from backend.classes.db_classes import User
 from backend.database.Service import UserService
@@ -15,6 +17,29 @@ ACCESS_TOKEN_EXPIRE_MINUTES = 30
 JWT_KEY = helper.generate_jwt_key_file_if_not_exist()
 ALGORITHM = "HS256"
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="login")
+
+
+
+# BEGIN ADDED CODE TO TRY AND GET IT WORKING LOCALLY
+app = FastAPI()
+# Allow requests from specific origins or use "*" for all origins (not recommended for production)
+origins = [
+    "http://localhost:8000",  # Localhost address, adjust as per requirement
+    "http://localhost",       # If testing locally
+    "file://",                # For running HTML from the local filesystem
+    "http://host.docker.internal:8000",
+]
+
+# Add CORS middleware to FastAPI
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=origins,    # This can be "*" for all origins, but should be restricted in production
+    allow_credentials=True,
+    allow_methods=["*"],      # Allows all HTTP methods
+    allow_headers=["*"],      # Allows all headers
+)
+# END ADDED CODE
+
 
 
 def create_access_token(data: dict, expires_delta: datetime.timedelta =  datetime.timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES)) -> str:

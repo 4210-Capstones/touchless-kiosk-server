@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin View</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f5f5f5;
+            margin: 0;
+            padding: 0;
+        }
+
+        header {
+            background-color: #003366;
+            color: white;
+            padding: 15px 20px;
+            text-align: center;
+        }
+
+        main {
+            padding: 20px;
+        }
+
+        .request-container {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .request {
+            background-color: white;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            padding: 20px;
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .request img {
+            max-width: 150px;
+            max-height: 150px;
+            border-radius: 8px;
+        }
+
+        .request-content {
+            flex-grow: 1;
+        }
+
+        .request-content h3 {
+            margin: 0;
+            font-size: 18px;
+            color: #003366;
+        }
+
+        .request-content p {
+            margin: 8px 0;
+            font-size: 14px;
+            color: #333;
+        }
+
+        .tags {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 5px;
+        }
+
+        .tag {
+            background-color: #003366;
+            color: white;
+            font-size: 12px;
+            padding: 5px 8px;
+            border-radius: 4px;
+        }
+
+        .actions {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .actions button {
+            background-color: #003366;
+            color: white;
+            border: none;
+            padding: 8px 12px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 14px;
+        }
+
+        .actions button.reject {
+            background-color: #d9534f;
+        }
+
+        .actions button:hover {
+            opacity: 0.9;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>Admin View: Image Requests</h1>
+    </header>
+    <main>
+        <div id="requests">
+            <!-- Requests will be dynamically injected here -->
+        </div>
+    </main>
+    <script src="admin.js"></script>
+</body>
+</html>
