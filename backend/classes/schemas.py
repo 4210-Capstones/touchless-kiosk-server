@@ -13,13 +13,21 @@ class UserSchema(BaseModel):
     user_email: EmailStr
     user_password: str =  Field(min_length=8, description="Password must be at least 8 characters long")
 
+class TagSchema(BaseModel):
+    tag_name: str
+    tag_description: Optional[str] = None
+
+    class Config:
+        orm_mode = True
+
 class RequestFormSchema(BaseModel):
-    imgreq_name: str
-    imgreq_email: EmailStr
-    imgreq_message: str
-    imgreq_startdate: datetime
-    imgreq_enddate: datetime
-    imgreq_tags: List[str]
+    imgreq_name: str = Field(..., example="John Doe")
+    imgreq_email: EmailStr = Field(..., example="johndoe@uno.edu")
+    imgreq_message: str= Field(..., example="Requesting this image to be displayed all of next week")
+    imgreq_startdate: datetime = Field(..., example="2024-12-02T00:00:00")
+    imgreq_enddate: datetime = Field(..., example="2024-12-06T23:59:59")
+    imgreq_tags: List[TagSchema] = Field(..., example=[{"tag_name": "acm"}]) # A list of tags associated with the request
+    imgreq_link: Optional[str] = Field(None, example="/uploads/img_requests/image_123.png")
 
     class Config:
         orm_mode = True

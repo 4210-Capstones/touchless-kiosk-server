@@ -4,12 +4,14 @@ from typing import List
 from datetime import datetime
 from pathlib import Path
 import shutil
+import uuid
 
 from backend.database.dependency_db import get_db
 from backend.classes.db_classes import ImageRequest, Image, ImageTag, Tag
+from backend.classes.schemas import RequestFormSchema
 
 # Define the router
-requestform_router = APIRouter(prefix="/imgrequestform", tags=["Form Requests"])
+requestform_router = APIRouter(prefix="/imgrequestform", tags=["Request Form"])
 
 @requestform_router.post("/")
 async def handle_form_submission(
@@ -40,7 +42,8 @@ async def handle_form_submission(
     uploaded_images = []
     for image in images:
         # Save image file to static/uploads directory
-        file_path = upload_dir / image.filename
+        unique_filename = f"{uuid.uuid4()}_{image.filename}"
+        file_path = upload_dir / unique_filename
         with open(file_path, "wb") as buffer:
             shutil.copyfileobj(image.file, buffer)
             print(f"Saved image to {file_path}")
@@ -80,3 +83,72 @@ async def handle_form_submission(
     db.commit()
 
     return {"message": "Form submitted successfully!"}
+
+# Admin Endpoint to View Requests
+@requestform_router.get("/imgrequests", response_model=List[RequestFormSchema])
+async def get_requests(db: Session = Depends(get_db)):
+    """
+    Fetch all image requests for admin review.
+    """
+    requests = db.query(ImageRequest).all()
+    if not requests:
+        return []
+    # Include related tags in the response
+    return [
+        {
+            "imgreq_name": req.imgreq_name,
+            "imgreq_email": req.imgreq_email,
+            "imgreq_message": req.imgreq_message,
+            "imgreq_startdate": req.imgreq_startdate,
+            "imgreq_enddate": req.imgreq_enddate,
+            "imgreq_tags": [
+                {"tag_name": tag.tag_name}
+                for tag in db.query(Tag)
+                .join(ImageTag)
+                .filter(ImageTag.image_link == req.imgreq_link)
+                .all()
+            ],
+            "imgreq_link": req.imgreq_link,
+        }
+        for req in requests
+    ]
+
+# Admin Endpoint to Approve Request
+@requestform_router.post("/admin/requests/{request_id}/approve")
+async def approve_request(request_id: int, db: Session = Depends(get_db)):
+    """
+    Approve a specific image request.
+    """
+    request = db.query(ImageRequest).filter(ImageRequest.id == request_id).first()
+    if not request:
+        raise HTTPException(status_code=404, detail="Request not found.")
+    # Example approval logic
+    request.imgreq_message += " (Approved)"
+    db.commit()
+    return {"message": f"Request {request_id} approved."}
+
+# Admin Endpoint to Reject Request
+@requestform_router.post("/admin/requests/{request_id}/reject")
+async def reject_request(request_id: int, db: Session = Depends(get_db)):
+    """
+    Reject a specific image request and remove its associated data.
+    """
+    request = db.query(ImageRequest).filter(ImageRequest.id == request_id).first()
+    if not request:
+        raise HTTPException(status_code=404, detail="Request not found.")
+    
+    # Retrieve and delete associated images from the filesystem
+    if request.imgreq_link:
+        image_path = Path(request.imgreq_link)  # Path to the image
+        if image_path.exists():
+            try:
+                image_path.unlink()  # Delete the image file
+                print(f"Deleted image file: {image_path}")
+            except Exception as e:
+                print(f"Failed to delete image file {image_path}: {e}")
+
+    # Remove the request record from the database
+    db.delete(request)
+    db.commit()
+
+    return {"message": f"Request {request_id} rejected and removed."}

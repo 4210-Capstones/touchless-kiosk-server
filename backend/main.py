@@ -35,14 +35,13 @@ async def lifespan(app: FastAPI):
 
 
 
-app = FastAPI(lifespan=lifespan)
+app = FastAPI()
 
 app.include_router(user_router)
 app.include_router(login_router)
-app.include_router(requestform_router)
 app.mount("/uploads", StaticFiles(directory="uploads"), name="uploads")
 
-# Add CORS middleware to your FastAPI app
+# CORS middleware
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"],  # Replace "*" with specific origins for production
@@ -50,6 +49,8 @@ app.add_middleware(
     allow_methods=["*"],  # Allow all HTTP methods (e.g., GET, POST)
     allow_headers=["*"],  # Allow all headers (e.g., Content-Type)
 )
+
+app.include_router(requestform_router)
 
 # just a test for db so far
 """if __name__ == '__main__':
