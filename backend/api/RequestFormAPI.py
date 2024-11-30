@@ -24,65 +24,53 @@ async def handle_form_submission(
     images: List[UploadFile] = File(...),
     db: Session = Depends(get_db)
 ):
-    """
-    Handle form submissions, save details to the database, and upload images.
-    """
-    # Validate dates
-    if start_date > end_date:
-        raise HTTPException(status_code=400, detail="Start date cannot be after end date.")
-    
-    if not tags:
-        raise HTTPException(status_code=400, detail="At least one tag must be selected.")
+    try:
+        # Validate input
+        if start_date > end_date:
+            raise HTTPException(status_code=400, detail="Start date cannot be after end date.")
+        if not tags:
+            raise HTTPException(status_code=400, detail="At least one tag must be selected.")
 
-    # Directory to save uploaded images
-    upload_dir = Path("uploads/img_requests")
-    upload_dir.mkdir(parents=True, exist_ok=True)
+        # Save images
+        upload_dir = Path("uploads/img_requests")
+        upload_dir.mkdir(parents=True, exist_ok=True)
 
-    # Save images and track their database records
-    uploaded_images = []
-    for image in images:
-        # Save image file to static/uploads directory
-        unique_filename = f"{uuid.uuid4()}_{image.filename}"
-        file_path = upload_dir / unique_filename
-        with open(file_path, "wb") as buffer:
-            shutil.copyfileobj(image.file, buffer)
-            print(f"Saved image to {file_path}")
+        uploaded_images = []
+        for image in images:
+            unique_filename = f"{uuid.uuid4()}_{image.filename}"
+            file_path = upload_dir / unique_filename
+            with open(file_path, "wb") as buffer:
+                shutil.copyfileobj(image.file, buffer)
+            new_image = Image(image_link=str(file_path), image_confirmed=False)
+            db.add(new_image)
+            db.commit()
+            uploaded_images.append(new_image)
 
-        # Save image record to the database
-        new_image = Image(
-            image_link=str(file_path),
-            image_confirmed=False
+        # Save the image request
+        new_request = ImageRequest(
+            imgreq_name=name,
+            imgreq_email=email,
+            imgreq_message=message,
+            imgreq_startdate=start_date,
+            imgreq_enddate=end_date,
+            imgreq_link=uploaded_images[0].image_link if uploaded_images else None,
         )
-        db.add(new_image)
-        db.commit()  # Commit to generate the primary key
-        uploaded_images.append(new_image)
+        db.add(new_request)
+        db.commit()
 
-    # Save the image request to the database
-    new_request = ImageRequest(
-        imgreq_name=name,
-        imgreq_email=email,
-        imgreq_message=message,
-        imgreq_startdate=start_date,
-        imgreq_enddate=end_date,
-        imgreq_link=uploaded_images[0].image_link if uploaded_images else None
-    )
-    db.add(new_request)
-    db.commit()
+        # Link tags to the images
+        for tag_name in tags:
+            tag = db.query(Tag).filter(Tag.tag_name == tag_name).first()
+            if tag:
+                for uploaded_image in uploaded_images:
+                    image_tag = ImageTag(image_link=uploaded_image.image_link, tag_id=tag.id)
+                    db.add(image_tag)
+        db.commit()
 
-    # Link tags to the images
-    for tag_name in tags:
-        tag = db.query(Tag).filter(Tag.tag_name == tag_name).first()
-        if not tag:
-            continue  # Skip unknown tags
-        for uploaded_image in uploaded_images:
-            image_tag = ImageTag(
-                image_link=uploaded_image.image_link,
-                tag_id=tag.id
-            )
-            db.add(image_tag)
-    db.commit()
-
-    return {"message": "Form submitted successfully!"}
+        # Return a response including the new request's ID
+        return {"message": "Form submitted successfully!", "id": new_request.id}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"An error occurred: {e}")
 
 # Admin Endpoint to View Requests
 @requestform_router.get("/imgrequests", response_model=List[RequestFormSchema])
@@ -93,9 +81,10 @@ async def get_requests(db: Session = Depends(get_db)):
     requests = db.query(ImageRequest).all()
     if not requests:
         return []
-    # Include related tags in the response
+
     return [
         {
+            "id": req.id,  # Ensure that the ID is included here
             "imgreq_name": req.imgreq_name,
             "imgreq_email": req.imgreq_email,
             "imgreq_message": req.imgreq_message,
@@ -108,21 +97,46 @@ async def get_requests(db: Session = Depends(get_db)):
                 .filter(ImageTag.image_link == req.imgreq_link)
                 .all()
             ],
-            "imgreq_link": req.imgreq_link,
+            "imgreq_link": f"/uploads/img_requests/{Path(req.imgreq_link).name}" if req.imgreq_link else None,
         }
         for req in requests
     ]
+
 
 # Admin Endpoint to Approve Request
 @requestform_router.post("/admin/requests/{request_id}/approve")
 async def approve_request(request_id: int, db: Session = Depends(get_db)):
     """
-    Approve a specific image request.
+    Approve a specific image request, move image to the slideshow folder, and update metadata.
     """
     request = db.query(ImageRequest).filter(ImageRequest.id == request_id).first()
     if not request:
         raise HTTPException(status_code=404, detail="Request not found.")
-    # Example approval logic
+    
+    # Define source and destination
+    if not request.imgreq_link:
+        raise HTTPException(status_code=400, detail="Request has no associated image.")
+    source = Path(request.imgreq_link)  # Points to server/uploads/img_requests
+    destination_folder = Path("../../front-end/images").resolve()
+    destination_folder.mkdir(parents=True, exist_ok=True)
+    destination = destination_folder / source.name
+    
+    try:
+        # Move image to the slideshow folder
+        shutil.move(str(source), str(destination))
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Failed to move image: {e}")
+    
+    # Update metadata (assume metadata file path is defined)
+    metadata_file = "uploads/slideshow_metadata.json"
+    initialize_metadata_file(metadata_file)
+    with open(metadata_file, "r") as file:
+        metadata = json.load(file)
+    metadata[destination.name] = (datetime.date.today() + datetime.timedelta(days=7)).isoformat()
+    with open(metadata_file, "w") as file:
+        json.dump(metadata, file, indent=4)
+    
+    # Mark request as approved
     request.imgreq_message += " (Approved)"
     db.commit()
     return {"message": f"Request {request_id} approved."}
@@ -131,24 +145,22 @@ async def approve_request(request_id: int, db: Session = Depends(get_db)):
 @requestform_router.post("/admin/requests/{request_id}/reject")
 async def reject_request(request_id: int, db: Session = Depends(get_db)):
     """
-    Reject a specific image request and remove its associated data.
+    Reject a specific image request and delete its associated data.
     """
     request = db.query(ImageRequest).filter(ImageRequest.id == request_id).first()
     if not request:
         raise HTTPException(status_code=404, detail="Request not found.")
     
-    # Retrieve and delete associated images from the filesystem
+    # Remove associated image
     if request.imgreq_link:
-        image_path = Path(request.imgreq_link)  # Path to the image
+        image_path = Path(request.imgreq_link)
         if image_path.exists():
             try:
                 image_path.unlink()  # Delete the image file
-                print(f"Deleted image file: {image_path}")
             except Exception as e:
-                print(f"Failed to delete image file {image_path}: {e}")
-
-    # Remove the request record from the database
+                raise HTTPException(status_code=500, detail=f"Failed to delete image: {e}")
+    
+    # Remove request record
     db.delete(request)
     db.commit()
-
     return {"message": f"Request {request_id} rejected and removed."}

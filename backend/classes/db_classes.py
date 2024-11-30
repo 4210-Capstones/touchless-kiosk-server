@@ -135,15 +135,15 @@ class BookingRoom(DBParentClass):
 class ImageRequest(DBParentClass):
     __abstract__ = False
 
-    # imgreq_id = Column(Integer, primary_key=True, autoincrement=True, nullable=False)
+    id = Column(Integer, primary_key=True, autoincrement=True, nullable=False)
     imgreq_name = Column(String(50), nullable=False)
     imgreq_email = Column(String(100), unique=True, nullable=False)
     imgreq_message = Column(String, nullable=False)
-    imgreq_link = Column(String, ForeignKey(Image.image_link), nullable=True) # e.g. user can submit request to extend length of existing image without submitting new image
-    imgreq_startdate = Column(DateTime, nullable=False, unique=False)
-    imgreq_enddate = Column(DateTime, nullable=False, unique=False)
+    imgreq_link = Column(String, ForeignKey(Image.image_link), nullable=True)
+    imgreq_startdate = Column(DateTime, nullable=False)
+    imgreq_enddate = Column(DateTime, nullable=False)
 
-    images : Mapped[List["Image"]] = relationship(back_populates="image_requests")
+    images: Mapped[List["Image"]] = relationship(back_populates="image_requests")
 
 
 class Club(DBParentClass):

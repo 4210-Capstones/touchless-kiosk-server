@@ -1,3 +1,5 @@
+"""import os
+from pathlib import Path
 from backend.database.dependency_db import get_db
 from backend.database.config_db import engine
 from faker import Faker
@@ -90,15 +92,26 @@ def create_fake_data():
         db.add(tag)
     db.commit()
 
-    # Create images
+    # Directory containing images
+    image_dir = Path("tests/test_images")
+
+    # Specific images to be used
+    image_filenames = ["test0.jpg", "test1.jpg", "test2.png", "test3.png", "test4.png", "test5.jpg", "test6.jpg", "test7.jpg", "test8.jpg"]
+
+
+    # Create images and add them to the database
     images = []
-    for _ in range(10):
-        image = Image(
-            image_link=faker.image_url(),
-            image_confirmed=faker.boolean()
-        )
-        images.append(image)
-        db.add(image)
+    for filename in image_filenames:
+        image_path = image_dir / filename
+        if image_path.exists():
+            new_image = Image(
+                image_link=str(image_path),  # Store the image path as a link
+                image_confirmed=faker.boolean()
+            )
+            images.append(new_image)
+            db.add(new_image)
+        else:
+            print(f"Warning: Image file {filename} does not exist in {image_dir}. Skipping.")
     db.commit()
 
     # Assign tags to images
@@ -183,14 +196,14 @@ def create_fake_data():
     db.commit()
 
     # Create image requests
-    for _ in range(15):
+    for image in images:
         image_request = ImageRequest(
             imgreq_name=faker.name(),
             imgreq_email=faker.email(),
             imgreq_message=faker.text(),
-            imgreq_link=random.choice(images).image_link,
+            imgreq_link=image.image_link,
             imgreq_startdate=faker.date_time_this_year(),
             imgreq_enddate=faker.date_time_this_year()
         )
         db.add(image_request)
-    db.commit()
+    db.commit()"""

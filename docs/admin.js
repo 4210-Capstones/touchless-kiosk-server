@@ -6,7 +6,15 @@ document.addEventListener("DOMContentLoaded", () => {
         try {
             const response = await fetch("http://localhost:8000/imgrequestform/imgrequests");
             if (!response.ok) throw new Error("Failed to fetch requests");
+    
             const requests = await response.json();
+            console.log("Fetched requests:", requests);
+    
+            // Validate requests array
+            if (!Array.isArray(requests)) {
+                throw new Error("Invalid response: Expected an array");
+            }
+    
             renderRequests(requests);
         } catch (error) {
             console.error("Error fetching requests:", error.message);
@@ -16,39 +24,62 @@ document.addEventListener("DOMContentLoaded", () => {
     // Render all requests
     function renderRequests(requests) {
         requestsContainer.innerHTML = ""; // Clear the container
+    
         requests.forEach((request) => {
             const requestElement = createRequestComponent(request);
-            requestsContainer.appendChild(requestElement);
+    
+            if (requestElement) { // Only append valid elements
+                requestsContainer.appendChild(requestElement);
+            } else {
+                console.warn("Skipped invalid request:", request);
+            }
         });
     }
 
     // Create a single request component
     function createRequestComponent(request) {
+        console.log("Processing request:", request); // Log the request object
+        if (!request.id) {
+            console.error("Missing ID in request:", request);
+            //return null;
+        }
+    
         const requestDiv = document.createElement("div");
         requestDiv.classList.add("request");
-
-        // Add request details
+    
+        requestDiv.id = `request-${request.id}`;
+    
         requestDiv.innerHTML = `
-            <h3>${request.imgreq_name}</h3>
-            <p><strong>Email:</strong> ${request.imgreq_email}</p>
-            <p><strong>Message:</strong> ${request.imgreq_message}</p>
-            <p><strong>Start Date:</strong> ${new Date(request.imgreq_startdate).toLocaleString()}</p>
-            <p><strong>End Date:</strong> ${new Date(request.imgreq_enddate).toLocaleString()}</p>
+            <h3>Request ID: ${request.id}</h3>
+            <h3>${request.imgreq_name || "Unknown Name"}</h3>
+            <p><strong>Email:</strong> ${request.imgreq_email || "No Email Provided"}</p>
+            <p><strong>Message:</strong> ${request.imgreq_message || "No Message Provided"}</p>
+            <p><strong>Start Date:</strong> ${
+                request.imgreq_startdate ? new Date(request.imgreq_startdate).toLocaleString() : "No Start Date"
+            }</p>
+            <p><strong>End Date:</strong> ${
+                request.imgreq_enddate ? new Date(request.imgreq_enddate).toLocaleString() : "No End Date"
+            }</p>
             <div class="tags">
-                ${request.imgreq_tags ? request.imgreq_tags.map(tag => `<span class="tag">${tag.tag_name}</span>`).join("") : ""}
+                ${request.imgreq_tags && request.imgreq_tags.length > 0
+                    ? request.imgreq_tags.map(tag => `<span class="tag">${tag.tag_name}</span>`).join("")
+                    : "<span class='no-tags'>No Tags</span>"}
             </div>
-            ${request.imgreq_link ? `<img src="${request.imgreq_link}" alt="Request Image">` : ""}
+            ${request.imgreq_link 
+                ? `<img src="http://localhost:8000/uploads/img_requests/${request.imgreq_link.replace(/\\/g, '').split('/').pop()}" alt="Request Image" onerror="this.src='/path/to/fallback-image.jpg';" class="request-image">`
+                : "<p class='no-image'>No Image Available</p>"}            
             <div class="actions">
                 <button class="approve" onclick="handleApprove(event, ${request.id})">Approve</button>
                 <button class="reject" onclick="handleReject(event, ${request.id})">Reject</button>
             </div>
         `;
 
+    
         return requestDiv;
     }
 
-    // Handle Approve Action
-    async function handleApprove(event, requestId) {
+    // Attach Approve and Reject handlers to the global window object
+    window.handleApprove = async function handleApprove(event, requestId) {
         const button = event.target; // Capture the button clicked
         disableButton(button);
         try {
@@ -59,14 +90,13 @@ document.addEventListener("DOMContentLoaded", () => {
             alert("Request approved successfully!");
             fetchRequests(); // Refresh the list
         } catch (error) {
-            console.error(error.message);
+            alert(`Error: ${error.message}`);
         } finally {
             enableButton(button, "Approve");
         }
-    }
+    };
 
-    // Handle Reject Action
-    async function handleReject(event, requestId) {
+    window.handleReject = async function handleReject(event, requestId) {
         const button = event.target; // Capture the button clicked
         disableButton(button);
         try {
@@ -77,11 +107,11 @@ document.addEventListener("DOMContentLoaded", () => {
             alert("Request rejected successfully!");
             fetchRequests(); // Refresh the list
         } catch (error) {
-            console.error(error.message);
+            alert(`Error: ${error.message}`);
         } finally {
             enableButton(button, "Reject");
         }
-    }
+    };
 
     // Utility: Disable Button
     function disableButton(button) {
