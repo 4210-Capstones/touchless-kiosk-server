@@ -13,7 +13,7 @@ from fastapi import FastAPI
 from backend.api.LoginAPI import login_router
 from backend.api.UserAPI import user_router
 from backend.database import config_db
-from backend.database import generate_mockdata
+from backend.database import generate_data
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
@@ -21,7 +21,7 @@ async def lifespan(app: FastAPI):
     if os.getenv("RUNNING_TESTS") != "true":
         config_db.wait_for_database()
         config_db.create_db()
-        generate_mockdata.create_fake_data()
+        generate_data.create_data()
 
     yield
 

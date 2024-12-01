@@ -53,6 +53,8 @@ class User(DBParentClass):
     user_password = Column(String(255), nullable=False)   # store hashed, not plain
 
     user_roles : Mapped[List["Role"]] = relationship(secondary="userrole", back_populates="users")
+    availability_tutor: Mapped["AvailabilityTutor"] = relationship(back_populates="tutor_info")
+    booking_tutor: Mapped["BookingTutor"] = relationship(back_populates="tutor_info")
 
 class Role(DBParentClass):
     __abstract__ = False
@@ -101,39 +103,92 @@ class ImageTag(DBParentClass):
         UniqueConstraint("image_link", "tag_id", name="uix_image_tag"),
     )
 
+class ScheduleType(DBParentClass):
+    __abstract__ = False
+
+    # id: Mapped[int] = mapped_column(primary_key=True)
+    scheduletype_name = Column(String(50), nullable=False)
+    scheduletype_description = Column(String(150), nullable=False)
+
+    schedules: Mapped[List["Schedule"]] = relationship(back_populates="schedule_type")
+
+class RepeatRule(DBParentClass):
+    __abstract__ = False
+
+    # id: Mapped[int] = mapped_column(primary_key=True)
+    repeatrule_name = Column(String(150), nullable=False, unique=True)
+    repeatrule_description = Column(String(150), nullable=False)
+
+    schedules: Mapped[List["Schedule"]] = relationship(back_populates="repeat_rule")
+
+# Schedule table
+class Schedule(DBParentClass):
+    __abstract__ = False
+
+    # id: Mapped[int] = mapped_column(primary_key=True)
+    schedule_name = Column(String(50), nullable=False)  # Event name or description
+    schedule_start_time = Column(DateTime, nullable=False)
+    schedule_end_time = Column(DateTime, nullable=True)
+    schedule_scheduletype_id = Column(Integer, ForeignKey("scheduletype.id"), nullable=False)
+    schedule_repeatrule_id = Column(Integer, ForeignKey("repeatrule.id"), nullable=True)
+
+    schedule_type: Mapped["ScheduleType"] = relationship(back_populates="schedules")
+    repeat_rule: Mapped["RepeatRule"] = relationship(back_populates="schedules")
+    booking_rooms: Mapped[List["BookingRoom"]] = relationship(back_populates="schedule")
+    booking_tutors: Mapped[List["BookingTutor"]] = relationship(back_populates="schedule")
+    availability_rooms: Mapped[List["AvailabilityRoom"]] = relationship(back_populates="schedule")
+    availability_tutors: Mapped[List["AvailabilityTutor"]] = relationship(back_populates="schedule")
+
 class Room(DBParentClass):
     __abstract__ = False
 
     room_number = Column(Integer, nullable=False, unique=True)
     room_available = Column(Boolean, nullable=False)
 
-    bookings : Mapped[List["Booking"]] = relationship(secondary="bookingroom", back_populates="rooms")
-    
-class BookingType(DBParentClass):
+    availability_rooms : Mapped[List["AvailabilityRoom"]] = relationship(back_populates="room")
+    booking_rooms : Mapped[List["BookingRoom"]] = relationship(back_populates="room")
+
+class AvailabilityRoom(DBParentClass):
     __abstract__ = False
 
-    # bookingtype_id = Column(Integer, primary_key=True, nullable=False, unique=False)
-    bookingtype_name = Column(String(50), nullable=False)
-    bookingtype_description = Column(String(255), nullable=True)
-    
-class Booking(DBParentClass):
+    # bookingroom_id = Column(Integer, primary_key=True, autoincrement=True, unique=True)
+    availability_room_number = Column(Integer, ForeignKey(Room.room_number))
+    availability_room_schedule_id = Column(Integer, ForeignKey("schedule.id"), nullable=False)
+
+    schedule: Mapped["Schedule"] = relationship(back_populates="availability_rooms")
+    room: Mapped["Room"] = relationship(back_populates="availability_rooms")
+
+class AvailabilityTutor(DBParentClass):
     __abstract__ = False
 
-    # booking_id = Column(Integer, primary_key=True, autoincrement=True, unique=True)
-    bookingtype_id = Column(Integer, ForeignKey(BookingType.id), unique=False)
-    booking_startdate = Column(DateTime, nullable=False, unique=False)
-    booking_enddate = Column(DateTime, nullable=False, unique=False)
-    booking_userid = Column(Integer, ForeignKey(User.id), nullable=False)
+    # bookingroom_id = Column(Integer, primary_key=True, autoincrement=True, unique=True)
+    availabilitytutor_schedule_id = Column(Integer, ForeignKey("schedule.id"), nullable=False)
+    availabilitytutor_tutorid = Column(Integer, ForeignKey(User.id), nullable=False, unique=True)
 
-    rooms : Mapped["Room"] = relationship(secondary="bookingroom", back_populates="bookings")
+    schedule: Mapped["Schedule"] = relationship(back_populates="availability_tutors")
+    tutor_info: Mapped["User"] = relationship(back_populates="availability_tutor")
+    
 
 class BookingRoom(DBParentClass):
     __abstract__ = False
 
     # bookingroom_id = Column(Integer, primary_key=True, autoincrement=True, unique=True)
-    booking_id = Column(Integer, ForeignKey(Booking.id))
-    room_number = Column(Integer, ForeignKey(Room.room_number))
+    bookingroom_number = Column(Integer, ForeignKey(Room.room_number))
+    bookingroom_schedule_id = Column(Integer, ForeignKey("schedule.id"), nullable=False)
 
+    schedule: Mapped["Schedule"] = relationship(back_populates="booking_rooms")
+    room: Mapped["Room"] = relationship(back_populates="booking_rooms")
+
+class BookingTutor(DBParentClass):
+    __abstract__ = False
+
+    # bookingroom_id = Column(Integer, primary_key=True, autoincrement=True, unique=True)
+    bookingtutor_schedule_id = Column(Integer, ForeignKey("schedule.id"), nullable=False)
+    bookingtutor_tutorid = Column(Integer, ForeignKey(User.id), nullable=False, unique=True)
+
+    schedule: Mapped["Schedule"] = relationship(back_populates="booking_tutors")
+    tutor_info: Mapped["User"] = relationship(back_populates="booking_tutor")
+    
 
 class ImageRequest(DBParentClass):
     __abstract__ = False
@@ -160,22 +215,22 @@ class Club(DBParentClass):
     requests : Mapped[List["ClubRequest"]] = relationship(back_populates="clubs")
 
 class ClubRequest(DBParentClass):
-    __abstract__ = False
+    _abstract = False
 
     # clubreq_id = Column(Integer, primary_key=True, autoincrement=True, nullable=False)
     clubreq_name = Column(String(50), nullable=False)
     clubreq_email = Column(String(100), nullable=False)
-    clubreq_date = Column(DateTime, default=datetime.utcnow)
+    clubreq_date = Column(DateTime, default=datetime.utcnow())
     club_id = Column(Integer, ForeignKey(Club.id), nullable=False)
 
-    clubs : Mapped["Club"] = relationship(back_populates="requests")
+    clubs : Mapped[List["Club"]] = relationship(back_populates="requests")
 
 # # Inspect and list tables
 # def list_tables():
-#     inspector = inspect(ENGINE)  # ENGINE should be the SQLAlchemy engine instance
-#     tables = inspector.get_table_names()
-#     return tables
-
-# if __name__ == "__main__":
-#     print("Tables in the database:")
-#     print(list_tables())
+# inspector = inspect(ENGINE)  # ENGINE should be the SQLAlchemy engine instance
+# tables = inspector.get_table_names()
+# return tables
+# if __name
+#  == "__main":
+# print("Tables in the database:")
+# print(list_tables())
