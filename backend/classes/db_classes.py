@@ -215,7 +215,7 @@ class Club(DBParentClass):
     requests : Mapped[List["ClubRequest"]] = relationship(back_populates="clubs")
 
 class ClubRequest(DBParentClass):
-    _abstract = False
+    __abstract__ = False
 
     # clubreq_id = Column(Integer, primary_key=True, autoincrement=True, nullable=False)
     clubreq_name = Column(String(50), nullable=False)
