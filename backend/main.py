@@ -1,16 +1,8 @@
-"""from classes.db_classes import User, Booking, BookingRoom, BookingType, Club, ClubRequest, Image, Role, UserRole, Tag, ImageTag, Room, ImageRequest
-from database.Service import UserService
-from database.config_db import create_db
-from database.dependency_db import get_db
-from database.config_db import engine
-from sqlalchemy_data_model_visualizer import generate_data_model_diagram, add_web_font_and_interactivity"""
-
 import os
 from contextlib import asynccontextmanager
 from pathlib import Path
 
 from fastapi import FastAPI
-
 
 from backend.api.RequestFormAPI import requestform_router
 from backend.api.LoginAPI import login_router
@@ -20,26 +12,27 @@ from backend.database import generate_mockdata
 from fastapi.staticfiles import StaticFiles
 from fastapi.middleware.cors import CORSMiddleware
 
+# Create the 'uploads' directory before starting the app
+os.makedirs("backend/uploads/img_requests", exist_ok=True)
+
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-    os.makedirs("uploads/img_requests", exist_ok=True)
+    os.makedirs("backend/uploads/img_requests", exist_ok=True)
     if os.getenv("RUNNING_TESTS") != "true":
         config_db.wait_for_database()
         config_db.create_db()
-        generate_mockdata.create_fake_data()
+        # generate_mockdata.create_fake_data()
 
     yield
 
     # Execute after app end
     pass
 
-
-
 app = FastAPI()
 
 app.include_router(user_router)
 app.include_router(login_router)
-app.mount("/uploads", StaticFiles(directory="uploads"), name="uploads")
+app.mount("/uploads", StaticFiles(directory="backend/uploads"), name="uploads")
 
 # CORS middleware
 app.add_middleware(

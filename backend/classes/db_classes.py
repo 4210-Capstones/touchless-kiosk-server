@@ -137,9 +137,9 @@ class ImageRequest(DBParentClass):
 
     id = Column(Integer, primary_key=True, autoincrement=True, nullable=False)
     imgreq_name = Column(String(50), nullable=False)
-    imgreq_email = Column(String(100), unique=True, nullable=False)
+    imgreq_email = Column(String(100), unique=False, nullable=False)
     imgreq_message = Column(String, nullable=False)
-    imgreq_link = Column(String, ForeignKey(Image.image_link), nullable=True)
+    imgreq_link = Column(String, ForeignKey(Image.image_link), nullable=True)  # Allow NULL value
     imgreq_startdate = Column(DateTime, nullable=False)
     imgreq_enddate = Column(DateTime, nullable=False)
 

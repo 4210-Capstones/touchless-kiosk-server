@@ -21,14 +21,14 @@ class TagSchema(BaseModel):
         orm_mode = True
 
 class RequestFormSchema(BaseModel):
-    id: int  # Add the ID here so it's included in responses
+    id: int
     imgreq_name: str = Field(..., example="John Doe")
-    imgreq_email: EmailStr = Field(..., example="johndoe@uno.edu")
+    imgreq_email: EmailStr = Field(..., example="jdoe@uno.edu")
     imgreq_message: str = Field(..., example="Requesting this image to be displayed all of next week")
     imgreq_startdate: datetime = Field(..., example="2024-12-02T00:00:00")
     imgreq_enddate: datetime = Field(..., example="2024-12-06T23:59:59")
-    imgreq_tags: List[TagSchema] = Field(..., example=[{"tag_name": "acm"}])  # A list of tags associated with the request
-    imgreq_link: Optional[str] = Field(None, example="/uploads/img_requests/image_123.png")
+    imgreq_tags: List[TagSchema] = Field(..., example=[{"tag_name": "acm"}])
+    imgreq_links: Optional[List[str]] = Field(None, example=["/uploads/img_requests/jdoe_request_1/image_123.png"])
 
     class Config:
-        orm_mode = True
+        from_attributes = True
