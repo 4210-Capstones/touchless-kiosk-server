@@ -3,7 +3,7 @@ All database classes will be declared here
 """
 from datetime import datetime
 from typing import List
-from sqlalchemy import Column, Integer, String, ForeignKey, DateTime, Boolean, UniqueConstraint
+from sqlalchemy import Column, Integer, String, ForeignKey, DateTime, Boolean, UniqueConstraint, Time
 from sqlalchemy.orm import declared_attr, relationship, Mapped
 
 from backend.database.config_db import BASE
@@ -225,6 +225,19 @@ class ClubRequest(DBParentClass):
 
     clubs : Mapped[List["Club"]] = relationship(back_populates="requests")
 
+class Tutoring(DBParentClass):
+    __abstract__ = False
+
+    name = Column(String, nullable=False)
+    email = Column(String, unique=True, nullable=False)
+    time_in = Column(Time, nullable=False)
+    time_out = Column(Time, nullable=False)
+
+    def __repr__(self):
+        return (
+            f"<Tutoring(id={self.id}, name={self.name}, email={self.email}, "
+            f"time_in={self.time_in}, time_out={self.time_out})>"
+        )
 # # Inspect and list tables
 # def list_tables():
 # inspector = inspect(ENGINE)  # ENGINE should be the SQLAlchemy engine instance
