@@ -233,11 +233,6 @@ class Tutoring(DBParentClass):
     time_in = Column(Time, nullable=False)
     time_out = Column(Time, nullable=False)
 
-    def __repr__(self):
-        return (
-            f"<Tutoring(id={self.id}, name={self.name}, email={self.email}, "
-            f"time_in={self.time_in}, time_out={self.time_out})>"
-        )
 # # Inspect and list tables
 # def list_tables():
 # inspector = inspect(ENGINE)  # ENGINE should be the SQLAlchemy engine instance
