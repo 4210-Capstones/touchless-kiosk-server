@@ -3,7 +3,7 @@ All database classes will be declared here
 """
 from datetime import datetime
 from typing import List
-from sqlalchemy import Column, Integer, String, ForeignKey, DateTime, Boolean, UniqueConstraint, Time
+from sqlalchemy import Column, Integer, String, ForeignKey, DateTime, Boolean, UniqueConstraint
 from sqlalchemy.orm import declared_attr, relationship, Mapped
 
 from backend.database.config_db import BASE
