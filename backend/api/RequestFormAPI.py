@@ -2,7 +2,7 @@ from fastapi import APIRouter, Depends, Form, File, UploadFile, HTTPException
 from sqlalchemy.orm import Session
 from typing import List
 from datetime import datetime
-from pathlib import Path
+from pathlib import Path, PurePosixPath
 import shutil
 import uuid
 
@@ -65,7 +65,7 @@ async def handle_form_submission(
             with open(file_path, "wb") as buffer:
                 shutil.copyfileobj(image.file, buffer)
             relative_file_path = f"/uploads/img_requests/{email.split('@')[0]}_request_{new_request.id}/{unique_filename}"
-            img_links.append(relative_file_path)
+            img_links.append(str(relative_file_path))  # Ensure it is a string
             print(f"[INFO] Saved image: {unique_filename} at {relative_file_path}")
 
 
@@ -146,71 +146,98 @@ async def approve_request(request_id: int, db: Session = Depends(get_db)):
     """
     Approve a specific image request, move images to the slideshow folder, and update metadata.
     """
+    # Fetch the request
     request = db.query(ImageRequest).filter(ImageRequest.id == request_id).first()
     if not request:
         raise HTTPException(status_code=404, detail="Request not found.")
     
-    # Define source and destination
+    # Ensure the request has associated images
     if not request.imgreq_link:
         raise HTTPException(status_code=400, detail="Request has no associated images.")
     
-    source = Path(request.imgreq_link)  # Directory containing images
-    destination_folder = Path("../../../touchless-kiosk-front-end/images").resolve() / f"{request.imgreq_name}_request_{request.id}"
-    logger.info(f"Source directory: {source}")
-    logger.info(f"Destination directory: {destination_folder}")
-    
-    # Ensure destination directory exists
-    try:
-        destination_folder.mkdir(parents=True, exist_ok=True)
-    except Exception as e:
-        logger.error(f"Failed to create destination directory: {e}")
-        raise HTTPException(status_code=500, detail=f"Failed to create destination directory: {e}")
+    # Define the destination folder for approved images
+    destination_folder = Path(f"../touchless-kiosk-front-end/images") # remove "/{request.imgreq_name}_request_{request.id}" if you want it to just dump the images into the directory willy nilly.
+    destination_folder.mkdir(parents=True, exist_ok=True)  # Create the directory if it doesn't exist
 
-    # Iterate over each image file and move it to the destination
+    # Define the base path where images are saved
+    base_path = Path("backend/uploads") 
+
+    # Identify the original request directory from the first image path
     try:
-        for image_file in source.iterdir():
-            if image_file.is_file():
-                destination_path = destination_folder / image_file.name
-                logger.info(f"Moving {image_file} to {destination_path}")
-                shutil.move(str(image_file), str(destination_path))
-                print(f"Moving {image_file} to {destination_path}")
+        image_links = request.imgreq_link.split(',')
+        first_image_path = base_path / Path(image_links[0].lstrip('/uploads/'))  # Get first image path
+        request_directory = first_image_path.parent  # Parent directory of the first image
+        
+        if not request_directory.exists() or not request_directory.is_dir():
+            raise HTTPException(status_code=500, detail="Original request directory does not exist.")
+    except Exception as e:
+        logger.error(f"Failed to identify request directory: {e}")
+        raise HTTPException(status_code=500, detail=f"Failed to identify request directory: {e}")
+
+    # Move images
+    try:
+        for image_link in image_links:
+            image_path = base_path / Path(image_link.lstrip('/uploads/'))  # Convert to filesystem path
+            if image_path.is_file():  # Validate file existence
+                destination_path = destination_folder / image_path.name
+                shutil.move(str(image_path), str(destination_path))  # Move the file
+                logger.info(f"Moved file from {image_path} to {destination_path}")
+            else:
+                logger.warning(f"File not found or invalid: {image_path}")
     except Exception as e:
         logger.error(f"Failed to move images: {e}")
         raise HTTPException(status_code=500, detail=f"Failed to move images: {e}")
 
-    # Remove the source directory if it's empty after moving all images
+    # Remove the original request directory if empty
     try:
-        if source.exists() and source.is_dir():
-            os.rmdir(source)
-            logger.info(f"Removed empty source directory: {source}")
-    except OSError as e:
-        logger.warning(f"Could not remove source directory {source}: {e}")
+        if request_directory.exists() and request_directory.is_dir() and not any(request_directory.iterdir()):
+            shutil.rmtree(request_directory)
+            logger.info(f"Removed original directory: {request_directory}")
+    except Exception as e:
+        logger.error(f"Failed to remove request directory: {e}")
+        raise HTTPException(status_code=500, detail=f"Failed to remove request directory: {e}")
 
-    # Mark request as approved
-    request.imgreq_message += " (Approved)"
+    # Mark the request as approved (update metadata)
+    db.delete(request)  # Remove the request from the admin view
     db.commit()
-    return {"message": f"Request {request_id} approved."}
+    return {"message": f"Request {request_id} approved and original directory removed after successful transfer."}
 
 # Admin Endpoint to Reject Request
 @requestform_router.post("/admin/requests/{request_id}/reject")
 async def reject_request(request_id: int, db: Session = Depends(get_db)):
     """
-    Reject a specific image request and delete its associated data.
+    Reject a specific image request, delete associated images and directory, and clean up database data.
     """
+    # Fetch the request
     request = db.query(ImageRequest).filter(ImageRequest.id == request_id).first()
     if not request:
         raise HTTPException(status_code=404, detail="Request not found.")
-    
-    # Remove associated images directory
-    if request.imgreq_link:
-        images_dir = Path(request.imgreq_link)
-        if images_dir.exists() and images_dir.is_dir():
-            try:
-                shutil.rmtree(images_dir)  # Delete the entire directory and its contents
-            except Exception as e:
-                raise HTTPException(status_code=500, detail=f"Failed to delete images: {e}")
 
-    # Remove request record
-    db.delete(request)
-    db.commit()
-    return {"message": f"Request {request_id} rejected and removed."}
+    try:
+        # Process associated images
+        if request.imgreq_link:  # Check if there are linked images
+            image_links = request.imgreq_link.split(',')  # Parse imgreq_link into individual file paths
+
+            # Identify the directory containing the images
+            first_image_path = Path("backend/uploads") / Path(image_links[0].lstrip('/uploads/'))  # Adjust the base path
+            directory_to_remove = first_image_path.parent  # Get parent directory of the first image
+
+            # Remove the directory and its contents
+            if directory_to_remove.exists() and directory_to_remove.is_dir():
+                shutil.rmtree(directory_to_remove)
+                logger.info(f"Removed directory: {directory_to_remove.as_posix()}")
+            else:
+                logger.warning(f"Directory not found or invalid: {directory_to_remove.as_posix()}")
+
+        # Clean up database data
+        db.delete(request)  # Remove the image request itself
+        db.commit()  # Commit the changes to the database
+        logger.info(f"Request {request_id} and associated data deleted from the database.")
+
+    except Exception as e:
+        logger.error(f"Failed to fully remove request {request_id}: {e}")
+        db.rollback()  # Roll back any partial changes in case of failure
+        raise HTTPException(status_code=500, detail=f"Failed to reject request: {e}")
+
+    return {"message": f"Request {request_id} rejected, all associated images and data removed."}
+

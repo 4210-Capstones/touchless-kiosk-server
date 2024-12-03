@@ -17,7 +17,7 @@ os.makedirs("backend/uploads/img_requests", exist_ok=True)
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-    os.makedirs("backend/uploads/img_requests", exist_ok=True)
+    os.makedirs("backend/uploads/img_requests", exist_ok=True) # ensure it's still there
     if os.getenv("RUNNING_TESTS") != "true":
         config_db.wait_for_database()
         config_db.create_db()

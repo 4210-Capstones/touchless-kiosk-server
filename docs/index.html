@@ -301,6 +301,12 @@
             window.handleApprove = async function handleApprove(event, requestId) {
                 const button = event.target; // Capture the button clicked
                 disableButton(button);
+
+                if (!confirm("Are you sure you want to approve this request? This action is irreversible.")) {
+                    enableButton(button, "Approve");
+                    return; // Cancel the operation
+                }
+
                 try {
                     const response = await fetch(`http://localhost:8000/imgrequestform/admin/requests/${requestId}/approve`, {
                         method: "POST",
@@ -318,6 +324,12 @@
             window.handleReject = async function handleReject(event, requestId) {
                 const button = event.target; // Capture the button clicked
                 disableButton(button);
+
+                if (!confirm("Are you sure you want to reject this request? This action is irreversible.")) {
+                    enableButton(button, "Reject");
+                    return; // Cancel the operation
+                }
+
                 try {
                     const response = await fetch(`http://localhost:8000/imgrequestform/admin/requests/${requestId}/reject`, {
                         method: "POST",
@@ -331,6 +343,7 @@
                     enableButton(button, "Reject");
                 }
             };
+
 
             // Utility: Disable Button
             function disableButton(button) {

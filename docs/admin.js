@@ -1,3 +1,4 @@
+/*
 document.addEventListener("DOMContentLoaded", () => {
     const requestsContainer = document.getElementById("requests");
 
@@ -41,8 +42,26 @@ document.addEventListener("DOMContentLoaded", () => {
         console.log("Processing request:", request); // Log the request object
         if (!request.id) {
             console.error("Missing ID in request:", request);
-            //return null;
+            return null;
         }
+    
+        // Create HTML for tags with specific color-coding
+        let tagsHtml = request.imgreq_tags && request.imgreq_tags.length > 0
+            ? request.imgreq_tags.map(tag => `<span class="tag ${getTagClass(tag.tag_name)}">${tag.tag_name}</span>`).join("")
+            : "<span class='no-tags'>No Tags</span>";
+    
+        let imagesHtml = "";
+        console.log('Before imagesHTML');
+        if (request.imgreq_links && Array.isArray(request.imgreq_links)) {
+            console.log('Inside imagesHTML');
+            imagesHtml = request.imgreq_links.map(link => {
+                console.log('Image link:', link);
+                return `<img src="http://localhost:8000${link}" alt="It no work" onerror="this.src='/uploads/img_requests/fallback.jpg';" class="request-image">`;
+            }).join("");
+        } else {
+            imagesHtml = "<p class='no-image'>No Image Available</p>";
+        }
+        console.log('After imagesHTML');
     
         const requestDiv = document.createElement("div");
         requestDiv.classList.add("request");
@@ -60,20 +79,13 @@ document.addEventListener("DOMContentLoaded", () => {
             <p><strong>End Date:</strong> ${
                 request.imgreq_enddate ? new Date(request.imgreq_enddate).toLocaleString() : "No End Date"
             }</p>
-            <div class="tags">
-                ${request.imgreq_tags && request.imgreq_tags.length > 0
-                    ? request.imgreq_tags.map(tag => `<span class="tag">${tag.tag_name}</span>`).join("")
-                    : "<span class='no-tags'>No Tags</span>"}
-            </div>
-            ${request.imgreq_link 
-                ? `<img src="http://localhost:8000/uploads/img_requests/${request.imgreq_link.replace(/\\/g, '').split('/').pop()}" alt="Request Image" onerror="this.src='/path/to/fallback-image.jpg';" class="request-image">`
-                : "<p class='no-image'>No Image Available</p>"}            
+            <div class="tags">${tagsHtml}</div>
+            <div class="images">${imagesHtml}</div>            
             <div class="actions">
                 <button class="approve" onclick="handleApprove(event, ${request.id})">Approve</button>
                 <button class="reject" onclick="handleReject(event, ${request.id})">Reject</button>
             </div>
         `;
-
     
         return requestDiv;
     }
@@ -128,3 +140,4 @@ document.addEventListener("DOMContentLoaded", () => {
     // Initial Fetch
     fetchRequests();
 });
+*/
