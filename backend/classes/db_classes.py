@@ -228,10 +228,10 @@ class ClubRequest(DBParentClass):
 class Tutoring(DBParentClass):
     __abstract__ = False
 
-    name = Column(String, nullable=False)
-    email = Column(String, unique=True, nullable=False)
-    time_in = Column(Time, nullable=False)
-    time_out = Column(Time, nullable=False)
+    tutoring_name = Column(String, nullable=False)
+    tutoring_email = Column(String, unique=True, nullable=False)
+    tutoring_time_in = Column(Time, nullable=False)
+    tutoring_time_out = Column(Time, nullable=False)
 
 # # Inspect and list tables
 # def list_tables():
