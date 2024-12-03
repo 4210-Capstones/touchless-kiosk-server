@@ -3,7 +3,7 @@ All database classes will be declared here
 """
 from datetime import datetime
 from typing import List
-from sqlalchemy import Column, Integer, String, ForeignKey, DateTime, Boolean, UniqueConstraint
+from sqlalchemy import Column, Integer, String, ForeignKey, DateTime, Boolean, UniqueConstraint, Time
 from sqlalchemy.orm import declared_attr, relationship, Mapped
 
 from backend.database.config_db import BASE
@@ -54,7 +54,8 @@ class User(DBParentClass):
 
     user_roles : Mapped[List["Role"]] = relationship(secondary="userrole", back_populates="users")
     availability_tutor: Mapped["AvailabilityTutor"] = relationship(back_populates="tutor_info")
-    booking_tutor: Mapped["BookingTutor"] = relationship(back_populates="tutor_info")
+    booking_tutor: Mapped["BookingTutor"] = relationship(back_populates="tutor_info", foreign_keys="[BookingTutor.bookingtutor_tutorid]")
+    booking_student: Mapped["BookingTutor"] = relationship(back_populates="student_info", foreign_keys="[BookingTutor.bookingtutor_studentid]")
 
 class Role(DBParentClass):
     __abstract__ = False
@@ -185,9 +186,11 @@ class BookingTutor(DBParentClass):
     # bookingroom_id = Column(Integer, primary_key=True, autoincrement=True, unique=True)
     bookingtutor_schedule_id = Column(Integer, ForeignKey("schedule.id"), nullable=False)
     bookingtutor_tutorid = Column(Integer, ForeignKey(User.id), nullable=False, unique=True)
+    bookingtutor_studentid =  Column(Integer, ForeignKey(User.id), nullable=False)
 
     schedule: Mapped["Schedule"] = relationship(back_populates="booking_tutors")
-    tutor_info: Mapped["User"] = relationship(back_populates="booking_tutor")
+    tutor_info: Mapped["User"] = relationship(foreign_keys=[bookingtutor_tutorid], back_populates="booking_tutor")
+    student_info: Mapped["User"] = relationship(foreign_keys=[bookingtutor_studentid], back_populates="booking_student")
     
 
 class ImageRequest(DBParentClass):

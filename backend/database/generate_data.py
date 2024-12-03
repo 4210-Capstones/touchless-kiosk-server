@@ -280,10 +280,12 @@ def create_data():
     # create booking tutors
     booking_tutors = []
     used_tutor_ids = set()
+    studentQuery = db.query(User).filter(User.user_roles.any(role_name="Student")).all()
 
     while len(booking_tutors) < len(tutorQuery):
         schedule = random.choice(all_schedules)
         tutor = random.choice(tutorQuery)
+        student = random.choice(studentQuery)
 
         # Skip if tutor id is already used
         if tutor.id in used_tutor_ids:
@@ -292,7 +294,8 @@ def create_data():
         booking_tutors.append(
             BookingTutor(
                 bookingtutor_schedule_id=schedule.id,
-                bookingtutor_tutorid=tutor.id
+                bookingtutor_tutorid=tutor.id,
+                bookingtutor_studentid=student.id
             )
         )
         used_tutor_ids.add(tutor.id)
