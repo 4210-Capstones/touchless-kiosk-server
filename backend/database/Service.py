@@ -72,3 +72,6 @@ class UserService(Service):
     @classmethod
     def get_by_mail(cls, mail: str, db: Session):
         return db.query(cls.model_class).filter(cls.model_class.user_email == mail).first()
+
+class TutoringService(Service):
+    model_class = Tutoring
