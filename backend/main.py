@@ -14,6 +14,7 @@ from backend.api.LoginAPI import login_router
 from backend.api.UserAPI import user_router
 from backend.database import config_db
 from backend.database import generate_data
+from backend.api.TutoringAPI import tutoring_router
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
@@ -33,6 +34,7 @@ app = FastAPI(lifespan=lifespan)
 
 app.include_router(user_router)
 app.include_router(login_router)
+app.include_router(tutoring_router)
 
 # just a test for db so far
 """if __name__ == '__main__':
