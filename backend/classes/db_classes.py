@@ -56,6 +56,7 @@ class User(DBParentClass):
     availability_tutor: Mapped["AvailabilityTutor"] = relationship(back_populates="tutor_info")
     booking_tutor: Mapped["BookingTutor"] = relationship(back_populates="tutor_info", foreign_keys="[BookingTutor.bookingtutor_tutorid]")
     booking_student: Mapped["BookingTutor"] = relationship(back_populates="student_info", foreign_keys="[BookingTutor.bookingtutor_studentid]")
+    booking_user: Mapped["BookingRoom"] = relationship(back_populates="user_info")
 
 class Role(DBParentClass):
     __abstract__ = False
@@ -176,9 +177,11 @@ class BookingRoom(DBParentClass):
     # bookingroom_id = Column(Integer, primary_key=True, autoincrement=True, unique=True)
     bookingroom_number = Column(Integer, ForeignKey(Room.room_number))
     bookingroom_schedule_id = Column(Integer, ForeignKey("schedule.id"), nullable=False)
+    bookingroom_userid =  Column(Integer, ForeignKey(User.id), nullable=False)
 
     schedule: Mapped["Schedule"] = relationship(back_populates="booking_rooms")
     room: Mapped["Room"] = relationship(back_populates="booking_rooms")
+    user_info: Mapped["User"] = relationship(back_populates="booking_user")
 
 class BookingTutor(DBParentClass):
     __abstract__ = False

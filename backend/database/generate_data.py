@@ -228,7 +228,8 @@ def create_data():
     booking_rooms = [
         BookingRoom(
             bookingroom_number=random.choice(rooms_list).room_number,
-            bookingroom_schedule_id=random.choice(all_schedules).id
+            bookingroom_schedule_id=random.choice(all_schedules).id,
+            bookingroom_userid=random.choice(users_list).id
         )
         for _ in range(15)  # Generate 15 booking-room entries
     ]
