@@ -46,9 +46,12 @@ def user_id(client):
 
     yield user.id
 
-    with get_test_db() as db:
+    
+    """
+    removed with get_test_db() as db:
         UserService.delete(user.id, db)
-
+            in order to test  test_delete_user
+    """
 
 @pytest.fixture(scope="module")
 def user_access_header(user_id, client):
