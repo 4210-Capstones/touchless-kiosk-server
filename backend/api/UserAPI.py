@@ -12,6 +12,8 @@ from backend.classes.schemas import UserSchema
 from backend.database.dependency_db import get_db
 from backend.handler import UserHandler
 from backend.handler.LoginHandler import get_current_user
+from backend.database.Service import UserService
+from fastapi import HTTPException
 
 user_router = APIRouter(prefix="/users", tags=["Users"])    # tags define metadata for documentation purposes
 
@@ -51,3 +53,41 @@ async def get_user(user: User = Depends(get_current_user)) -> User:
     """
 
     return user
+
+
+
+    from fastapi import HTTPException, status
+
+
+
+
+
+@user_router.get("/get-id", status_code=200)
+async def get_user_id(email: str, db: Session = Depends(get_db)) -> dict:
+    """
+    Get a user's ID by their email.
+
+        
+    """
+    user = UserService.get_by_mail(email, db)
+    if not user:
+        raise HTTPException(status_code=404, detail="User not found")
+
+    return {"user_id": user.id}
+
+
+
+
+
+
+@user_router.delete("/{user_id}", status_code=204)
+async def delete_user(user_id: int, db: Session = Depends(get_db)) -> None:
+    """
+    Deletes a user from the database by their user ID. Any authenticated user can initiate this request.
+    """
+    try:
+        UserHandler.delete_user(user_id, db)
+    except HTTPException as e:
+        raise HTTPException(status_code=e.status_code, detail=e.detail)
+    except Exception as e:
+        raise HTTPException(status_code=500, detail="An error occurred during the deletion process.")
