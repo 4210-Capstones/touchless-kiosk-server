@@ -25,3 +25,17 @@ def create_user(user: UserSchema, db: Session) -> None:
         UserService.create(user, db)
     except IntegrityError:
         raise HTTPException(409, f"A user with the mail {user.user_email} already exists. Try different email.")
+
+
+
+
+def delete_user(user_id: int, db: Session) -> None:
+    """
+    Deletes a user from the database by their ID. 
+
+   
+    """
+    try:
+        UserService.delete(user_id, db)
+    except Exception as e:  # This might be too broad; you could handle specific exceptions if needed
+        raise HTTPException(status_code=404, detail="User not found")
