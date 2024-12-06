@@ -25,25 +25,25 @@ class DBParentClass(BASE):
         # continue implementation
     """
 
-    __abstract__ = True
+    __abstract__ = True # This prevents the table from being created directly.
 
     @declared_attr
-    def __tablename__(self):
+    def __tablename__(self):   # Automatically sets the table name to the lowercase class name
         return self.__name__.lower()
 
     id = Column(Integer, unique=True, index=True, primary_key=True, nullable=False, autoincrement=True)
 
-    def to_dict(self):
+    def to_dict(self): # Converts the object into a dictionary with all its columns
         return dict((col, getattr(self, col)) for col in self.__table__.columns.keys())
 
-    def __str__(self):
+    def __str__(self):  # String representation of the object, showing its type and attributes
         return "%s(%s)" % (
             type(self).__name__,
             ", ".join("%s=%s" % item for item in vars(self).items())
         )
 
 
-class User(DBParentClass):
+class User(DBParentClass): # User table representing users in the system
     __abstract__ = False
 
     # user_id = Column(Integer, primary_key=True, autoincrement=True, nullable=False, unique=True)
@@ -58,7 +58,7 @@ class User(DBParentClass):
     booking_student: Mapped["BookingTutor"] = relationship(back_populates="student_info", foreign_keys="[BookingTutor.bookingtutor_studentid]")
     booking_user: Mapped["BookingRoom"] = relationship(back_populates="user_info")
 
-class Role(DBParentClass):
+class Role(DBParentClass): # Role table for defining roles (e.g., admin, tutor, student)
     __abstract__ = False
 
     # role_id = Column(Integer, primary_key=True, autoincrement=True, nullable=False, unique=True)
@@ -67,7 +67,7 @@ class Role(DBParentClass):
 
     users : Mapped[List["User"]] = relationship(secondary="userrole", back_populates="user_roles")
 
-class UserRole(DBParentClass):
+class UserRole(DBParentClass): # Association table for User and Role (many-to-many relationship)
     __abstract__ = False
 
     user_id = Column(Integer, ForeignKey(User.id))
@@ -77,16 +77,16 @@ class UserRole(DBParentClass):
         UniqueConstraint("user_id", "role_id", name="uix_user_role"),
     )
 
-class Tag(DBParentClass):
+class Tag(DBParentClass): # Tag table for categorizing images
     __abstract__ = False
 
     # tag_id = Column(Integer, primary_key=True, autoincrement=True, nullable=False)
     tag_name = Column(String(50), nullable=False)
     tag_description = Column(String, nullable=True)
 
-    images : Mapped[List["Image"]] = relationship(secondary="imagetag", back_populates="tags")
+    images : Mapped[List["Image"]] = relationship(secondary="imagetag", back_populates="tags")   # Many-to-many relationship with images
 
-class Image(DBParentClass):
+class Image(DBParentClass): # Image table for storing image metadata
     __abstract__ = False
 
     image_link = Column(String, unique=True, nullable=False)
@@ -95,7 +95,7 @@ class Image(DBParentClass):
     image_requests : Mapped[List["ImageRequest"]] = relationship(back_populates="images")
     tags : Mapped[List["Tag"]] = relationship(secondary="imagetag", back_populates="images")
 
-class ImageTag(DBParentClass):
+class ImageTag(DBParentClass): # Association table for Image and Tag (many-to-many relationship)
     __abstract__ = False
 
     image_link = Column(String, ForeignKey(Image.image_link))
@@ -105,7 +105,7 @@ class ImageTag(DBParentClass):
         UniqueConstraint("image_link", "tag_id", name="uix_image_tag"),
     )
 
-class ScheduleType(DBParentClass):
+class ScheduleType(DBParentClass): # ScheduleType table for different types of schedules
     __abstract__ = False
 
     # id: Mapped[int] = mapped_column(primary_key=True)
@@ -114,7 +114,7 @@ class ScheduleType(DBParentClass):
 
     schedules: Mapped[List["Schedule"]] = relationship(back_populates="schedule_type")
 
-class RepeatRule(DBParentClass):
+class RepeatRule(DBParentClass): # RepeatRule table for scheduling repetition rules
     __abstract__ = False
 
     # id: Mapped[int] = mapped_column(primary_key=True)
@@ -124,7 +124,7 @@ class RepeatRule(DBParentClass):
     schedules: Mapped[List["Schedule"]] = relationship(back_populates="repeat_rule")
 
 # Schedule table
-class Schedule(DBParentClass):
+class Schedule(DBParentClass): # Schedule table for defining events and schedules
     __abstract__ = False
 
     # id: Mapped[int] = mapped_column(primary_key=True)
@@ -141,37 +141,40 @@ class Schedule(DBParentClass):
     availability_rooms: Mapped[List["AvailabilityRoom"]] = relationship(back_populates="schedule")
     availability_tutors: Mapped[List["AvailabilityTutor"]] = relationship(back_populates="schedule")
 
-class Room(DBParentClass):
+class Room(DBParentClass): # Room table for representing rooms in the school system (specifically the math building)
     __abstract__ = False
 
     room_number = Column(Integer, nullable=False, unique=True)
     room_available = Column(Boolean, nullable=False)
 
+    # Relationships with availability and booking tables
     availability_rooms : Mapped[List["AvailabilityRoom"]] = relationship(back_populates="room")
     booking_rooms : Mapped[List["BookingRoom"]] = relationship(back_populates="room")
 
-class AvailabilityRoom(DBParentClass):
+class AvailabilityRoom(DBParentClass): # AvailabilityRoom table to track room availability
     __abstract__ = False
 
     # bookingroom_id = Column(Integer, primary_key=True, autoincrement=True, unique=True)
     availability_room_number = Column(Integer, ForeignKey(Room.room_number))
     availability_room_schedule_id = Column(Integer, ForeignKey("schedule.id"), nullable=False)
 
+    # Relationships to Room and Schedule
     schedule: Mapped["Schedule"] = relationship(back_populates="availability_rooms")
     room: Mapped["Room"] = relationship(back_populates="availability_rooms")
 
-class AvailabilityTutor(DBParentClass):
+class AvailabilityTutor(DBParentClass): # AvailabilityTutor table to track tutor availability
     __abstract__ = False
 
     # bookingroom_id = Column(Integer, primary_key=True, autoincrement=True, unique=True)
     availabilitytutor_schedule_id = Column(Integer, ForeignKey("schedule.id"), nullable=False)
     availabilitytutor_tutorid = Column(Integer, ForeignKey(User.id), nullable=False, unique=True)
 
+    # Relationships to Schedule and User
     schedule: Mapped["Schedule"] = relationship(back_populates="availability_tutors")
     tutor_info: Mapped["User"] = relationship(back_populates="availability_tutor")
     
 
-class BookingRoom(DBParentClass):
+class BookingRoom(DBParentClass): # BookingRoom table to track room bookings
     __abstract__ = False
 
     # bookingroom_id = Column(Integer, primary_key=True, autoincrement=True, unique=True)
@@ -179,11 +182,12 @@ class BookingRoom(DBParentClass):
     bookingroom_schedule_id = Column(Integer, ForeignKey("schedule.id"), nullable=False)
     bookingroom_userid =  Column(Integer, ForeignKey(User.id), nullable=False)
 
+    # Relationships to Room, Schedule, and User
     schedule: Mapped["Schedule"] = relationship(back_populates="booking_rooms")
     room: Mapped["Room"] = relationship(back_populates="booking_rooms")
     user_info: Mapped["User"] = relationship(back_populates="booking_user")
 
-class BookingTutor(DBParentClass):
+class BookingTutor(DBParentClass): # BookingTutor table to track tutor bookings
     __abstract__ = False
 
     # bookingroom_id = Column(Integer, primary_key=True, autoincrement=True, unique=True)
@@ -191,12 +195,13 @@ class BookingTutor(DBParentClass):
     bookingtutor_tutorid = Column(Integer, ForeignKey(User.id), nullable=False, unique=True)
     bookingtutor_studentid =  Column(Integer, ForeignKey(User.id), nullable=False)
 
+    # Relationships to Schedule, Tutor, and Student
     schedule: Mapped["Schedule"] = relationship(back_populates="booking_tutors")
     tutor_info: Mapped["User"] = relationship(foreign_keys=[bookingtutor_tutorid], back_populates="booking_tutor")
     student_info: Mapped["User"] = relationship(foreign_keys=[bookingtutor_studentid], back_populates="booking_student")
     
 
-class ImageRequest(DBParentClass):
+class ImageRequest(DBParentClass): # ImageRequest table to manage requests for images
     __abstract__ = False
 
     # imgreq_id = Column(Integer, primary_key=True, autoincrement=True, nullable=False)
@@ -207,10 +212,11 @@ class ImageRequest(DBParentClass):
     imgreq_startdate = Column(DateTime, nullable=False, unique=False)
     imgreq_enddate = Column(DateTime, nullable=False, unique=False)
 
+    # Relationship with Image
     images : Mapped[List["Image"]] = relationship(back_populates="image_requests")
 
 
-class Club(DBParentClass):
+class Club(DBParentClass): # Club table to represent school clubs
     __abstract__ = False
 
     # club_id = Column(Integer, primary_key=True, autoincrement=True, nullable=False)
@@ -218,9 +224,10 @@ class Club(DBParentClass):
     club_description = Column(String, nullable=False)
     club_upcoming_activities = Column(String, nullable=True)
 
+     # Relationship with club requests
     requests : Mapped[List["ClubRequest"]] = relationship(back_populates="clubs")
 
-class ClubRequest(DBParentClass):
+class ClubRequest(DBParentClass): # ClubRequest table to manage requests related to clubs
     __abstract__ = False
 
     # clubreq_id = Column(Integer, primary_key=True, autoincrement=True, nullable=False)
@@ -229,6 +236,7 @@ class ClubRequest(DBParentClass):
     clubreq_date = Column(DateTime, default=datetime.utcnow())
     club_id = Column(Integer, ForeignKey(Club.id), nullable=False)
 
+    # Relationship with Club
     clubs : Mapped[List["Club"]] = relationship(back_populates="requests")
 
 # # Inspect and list tables
