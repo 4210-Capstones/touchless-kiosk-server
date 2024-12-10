@@ -1,38 +1,52 @@
-"""from classes.db_classes import User, Booking, BookingRoom, BookingType, Club, ClubRequest, Image, Role, UserRole, Tag, ImageTag, Room, ImageRequest
-from database.Service import UserService
-from database.config_db import create_db
-from database.dependency_db import get_db
-from database.config_db import engine
-from sqlalchemy_data_model_visualizer import generate_data_model_diagram, add_web_font_and_interactivity"""
-
 import os
 from contextlib import asynccontextmanager
+from pathlib import Path
 
 from fastapi import FastAPI
 
+from backend.api.RequestFormAPI import requestform_router
 from backend.api.LoginAPI import login_router
 from backend.api.UserAPI import user_router
 from backend.database import config_db
 from backend.database import generate_data
+#from backend.database import generate_mockdata
+from fastapi.staticfiles import StaticFiles
+from fastapi.middleware.cors import CORSMiddleware
+
+# Create the 'uploads' directory before starting the app
+os.makedirs("backend/uploads/img_requests", exist_ok=True)
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
+    os.makedirs("backend/uploads/img_requests", exist_ok=True) # ensure it's still there
     os.makedirs(os.path.dirname("res/"), exist_ok=True)
     if os.getenv("RUNNING_TESTS") != "true":
         config_db.wait_for_database()
         config_db.create_db()
         generate_data.create_data()
+        # generate_mockdata.create_fake_data()
 
     yield
 
     # Execute after app end
     pass
 
-
-app = FastAPI(lifespan=lifespan)
+app = FastAPI()
 
 app.include_router(user_router)
 app.include_router(login_router)
+app.mount("/uploads", StaticFiles(directory="backend/uploads"), name="uploads")
+
+# CORS middleware
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],  # Replace "*" with specific origins for production
+    allow_credentials=True,
+    allow_methods=["*"],  # Allow all HTTP methods (e.g., GET, POST)
+    allow_headers=["*"],  # Allow all headers (e.g., Content-Type)
+)
+
+app.include_router(requestform_router)
 
 # just a test for db so far
 """if __name__ == '__main__':

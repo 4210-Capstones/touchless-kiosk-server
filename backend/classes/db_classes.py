@@ -1,6 +1,3 @@
-"""
-All database classes will be declared here
-"""
 from datetime import datetime
 from typing import List
 from sqlalchemy import Column, Integer, String, ForeignKey, DateTime, Boolean, UniqueConstraint
@@ -204,16 +201,15 @@ class BookingTutor(DBParentClass): # BookingTutor table to track tutor bookings
 class ImageRequest(DBParentClass): # ImageRequest table to manage requests for images
     __abstract__ = False
 
-    # imgreq_id = Column(Integer, primary_key=True, autoincrement=True, nullable=False)
+    #imgreq_id = Column(Integer, primary_key=True, autoincrement=True, nullable=False)
     imgreq_name = Column(String(50), nullable=False)
-    imgreq_email = Column(String(100), unique=True, nullable=False)
+    imgreq_email = Column(String(100), unique=False, nullable=False)
     imgreq_message = Column(String, nullable=False)
-    imgreq_link = Column(String, ForeignKey(Image.image_link), nullable=False)
-    imgreq_startdate = Column(DateTime, nullable=False, unique=False)
-    imgreq_enddate = Column(DateTime, nullable=False, unique=False)
+    imgreq_link = Column(String, ForeignKey(Image.image_link), nullable=True)  # Allow NULL value
+    imgreq_startdate = Column(DateTime, nullable=False)
+    imgreq_enddate = Column(DateTime, nullable=False)
 
-    # Relationship with Image
-    images : Mapped[List["Image"]] = relationship(back_populates="image_requests")
+    images: Mapped[List["Image"]] = relationship(back_populates="image_requests")
 
 
 class Club(DBParentClass): # Club table to represent school clubs
