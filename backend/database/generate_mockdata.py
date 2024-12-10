@@ -1,4 +1,4 @@
-"""import os
+import os
 from pathlib import Path
 from backend.database.dependency_db import get_db
 from backend.database.config_db import engine
@@ -74,19 +74,19 @@ def create_fake_data():
 
     # Create tags
     tags = [
-        Tag(tag_name="Hackathon", tag_description="Tag for Hackathon events"),
-        Tag(tag_name="ACM", tag_description="Tag for ACM events"),
-        Tag(tag_name="ACMW", tag_description="Tag for ACMW events"),
-        Tag(tag_name="CTF", tag_description="Tag for CTF events"),
-        Tag(tag_name="GDSC", tag_description="Tag for GDSC events"),
-        Tag(tag_name="ICPC", tag_description="Tag for ICPC events"),
-        Tag(tag_name="IEEE", tag_description="Tag for IEEE events"),
-        Tag(tag_name="IGDA", tag_description="Tag for IGDA events"),
-        Tag(tag_name="Robotics", tag_description="Tag for Robotics events"),
-        Tag(tag_name="WebDev", tag_description="Tag for WebDev events"),
-        Tag(tag_name="Workshops", tag_description="Tag for Workshops events"),
-        Tag(tag_name="Jobs", tag_description="Tag for Jobs events"),
-        Tag(tag_name="Research", tag_description="Tag for Research events")
+        Tag(tag_name="hackathon", tag_description="Tag for Hackathon events"),
+        Tag(tag_name="acm", tag_description="Tag for ACM events"),
+        Tag(tag_name="acmw", tag_description="Tag for ACMW events"),
+        Tag(tag_name="ctf", tag_description="Tag for CTF events"),
+        Tag(tag_name="gdsc", tag_description="Tag for GDSC events"),
+        Tag(tag_name="icpc", tag_description="Tag for ICPC events"),
+        Tag(tag_name="ieee", tag_description="Tag for IEEE events"),
+        Tag(tag_name="igda", tag_description="Tag for IGDA events"),
+        Tag(tag_name="robotics", tag_description="Tag for Robotics events"),
+        Tag(tag_name="webdev", tag_description="Tag for WebDev events"),
+        Tag(tag_name="workshops", tag_description="Tag for Workshops events"),
+        Tag(tag_name="jobs", tag_description="Tag for Jobs events"),
+        Tag(tag_name="research", tag_description="Tag for Research events")
     ]
     for tag in tags:
         db.add(tag)
@@ -96,7 +96,17 @@ def create_fake_data():
     image_dir = Path("tests/test_images")
 
     # Specific images to be used
-    image_filenames = ["test0.jpg", "test1.jpg", "test2.png", "test3.png", "test4.png", "test5.jpg", "test6.jpg", "test7.jpg", "test8.jpg"]
+    image_filenames = ["SabrinaFarmer.png",
+                        "rubberducks.png",
+                        "CyberSecurityWeek.png",
+                        "ClubMeeting.png",
+                        "GameJam.png",
+                        "VideoGameDay.png",
+                        "gamenight.jpg",
+                        "test2.png",
+                        "test3.png",
+                        "test4.png"
+                    ]
 
 
     # Create images and add them to the database
@@ -206,4 +216,4 @@ def create_fake_data():
             imgreq_enddate=faker.date_time_this_year()
         )
         db.add(image_request)
-    db.commit()"""
+    db.commit()

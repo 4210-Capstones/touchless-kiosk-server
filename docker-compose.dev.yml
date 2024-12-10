@@ -20,6 +20,7 @@ services:
     volumes:
       - ./backend:/container/backend
       - ./.env:/container/.env
+      - ./uploads:/app/uploads
     env_file:
       - .env
     #depends_on:
