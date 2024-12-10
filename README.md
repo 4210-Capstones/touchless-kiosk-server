@@ -1,10 +1,15 @@
 # touchless-kiosk-server
 
-## Run completely in Docker
+## Run completely in Docker Step by Step
 
-Run the command:
+1. Git clone the touchless kiosk server in your command prompt / console.
 
-`docker-compose -f docker-compose.dev.yml up`   
+2. Download Docker Desktop then open the terminal in docker.
+
+3. Using the terminal go to the directory where you git cloned the touchless kiosk server.
+  
+4.  Run the command: `docker-compose -f docker-compose.dev.yml up` 
+  
 
 Use flag `-d` to detach
 
